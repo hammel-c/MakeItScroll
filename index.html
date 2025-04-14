@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MakeItScroll — Teleprompter</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0; /* Light text for dark background */
+            background-color: #0f0f0f;; /* Dark background */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-y: scroll; /* Show vertical scrollbar */
+        }
+        /* Main content styles */
+        main {
+            flex: 1;
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        
+        /* Footer styles */
+        footer {
+            background-color: #000000;
+            color: #858585;
+            text-align: center;
+            padding: 0.5rem;
+            font-size: 0.8rem;
+        }
+        /* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #000000; 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #555555; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
+}
+a{
+    text-decoration: none;
+    color: #2196F3;
+}
+        /* Edit mode styles */
+        
+        #text-input {
+            width: 100%;
+            min-height: 100px; /* Reduced min-height */
+            padding: 1rem;
+            font-size: 1rem;
+            color: #e0e0e0;
+            background-color: #2d2d2d;
+            border: 1px solid #444;
+            border-radius: 4px;
+            resize: none; /* Disable manual resizing */
+            overflow-y: hidden; /* Hide scrollbar */
+            line-height: 1.6; /* Match line height for accurate calculations */
+        }
+        
+        .controls {
+            background-color: #1e1e1e; /* Dark gray */
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+        }
+        
+        .control-group {
+            margin-bottom: 1rem;
+        }
+        
+        .control-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #e0e0e0;
+        }
+        
+        .control-value {
+            display: inline-block;
+            min-width: 40px;
+            text-align: right;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            margin: 0.5rem 0;
+            background-color: #444;
+        }
+        
+        .switch-container {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+            color: #e0e0e0;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-right: 10px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #444;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        button {
+            font-family: monospace;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 2rem;
+            border-radius: 20px 20px 0px 0px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #0066ba;
+        }
+        
+        #start-button {
+            width: 100%;
+            margin-top: 1rem;
+        }
+        
+        /* Scroll mode styles */
+        .scroll-container {
+            display: none;
+            height: calc(100vh - 40px);
+            position: relative;
+            background-color: #000000; /* Black background for teleprompter */
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        .scroll-text-container {
+            height: 100%;
+            overflow-y: auto;
+            padding: 2rem;
+            padding-left: 80px; /* Add padding to prevent overlap with controls */
+            cursor: grab;
+            /* Improve scrolling performance */
+            will-change: transform, scroll-position;
+            -webkit-overflow-scrolling: touch;
+            
+            /* Hide scrollbar for Chrome, Safari and Opera */
+            &::-webkit-scrollbar {
+                display: none;
+            }
+            
+            /* Hide scrollbar for IE, Edge and Firefox */
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        
+        .scroll-text-container:active {
+            cursor: grabbing;
+        }
+        
+        .scroll-text {
+            white-space: pre-wrap;
+            padding-bottom: 100vh;
+            color: #ffffff; /* Bright white text for maximum contrast */
+            
+            /* Prevent text selection/highlighting */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        .mirrored {
+            transform: scaleX(-1);
+        }
+        
+        .side-controls {
+            position: fixed;
+            left: 20px; /* Changed from right to left */
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            z-index: 100; /* Ensure controls are above text */
+        }
+        
+        .control-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #333; /* Darker button background */
+            color: #fff; /* White text/icon */
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0;
+        }
+        
+        .control-button:hover {
+            background-color: #444; /* Slightly lighter on hover */
+        }
+        
+        .control-divider {
+            height: 1px;
+            background-color: rgba(255, 255, 255, 0.2);
+            margin: 5px 0;
+        }
+        
+        /* Floating values display with fade effect */
+        .values-display {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            opacity: 0; /* Start invisible */
+            transition: opacity 1.5s ease; /* Smooth fade transition */
+            pointer-events: none; /* Don't interfere with clicks */
+        }
+        
+        .values-display.visible {
+            opacity: 1;
+        }
+        
+        .values-display p {
+            margin: 0;
+            line-height: 1.4;
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .controls {
+                padding: 1rem;
+            }
+            
+            .side-controls {
+                left: 10px; /* Changed from right to left */
+                padding: 10px;
+            }
+            
+            .control-button {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .scroll-text-container {
+                padding-left: 60px; /* Smaller padding on mobile */
+            }
+            
+            .values-display {
+                right: 10px;
+                bottom: 10px;
+                font-size: 0.8rem;
+                padding: 8px 12px;
+            }
+        }
+        /* Wake lock indicator */
+.wake-lock-indicator {
+    position: fixed;
+    right: 20px;
+    top: 20px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    pointer-events: none;
+}
+
+.wake-lock-indicator.visible {
+    opacity: 1;
+}
+
+/* Hidden video for fallback wake lock */
+#wake-lock-video {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0.01;
+    pointer-events: none;
+}
+
+/* Add this to your responsive styles section */
+@media (max-width: 768px) {
+    .wake-lock-indicator {
+        top: 10px;
+        right: 10px;
+        font-size: 0.8rem;
+        padding: 8px 12px;
+    }
+}
+    </style>
+</head>
+<body>
+    <main>
+        <!-- Edit Mode -->
+        <div id="edit-mode">
+            <button id="start-button">MakeItScroll</button>
+            <div class="edit-container">
+                <textarea id="text-input" placeholder="Enter your teleprompter text here...">
+                    
+MakeItScroll – the quick  and opens source Teleprompter tool
+
+You can set the font size, scroll speed and toggle mirror mode to use on a real mirror teleprompter.
+                    
+When you're ready, click "MakeItScroll" to start the teleprompter.
+                    
+Check the little foofter for the code on Github.
+                </textarea>
+            </div>
+            
+            <div class="controls">
+                <div class="control-group">
+                    <label for="font-size">Font Size: <span id="font-size-value" class="control-value">36</span>px</label>
+                    <input type="range" id="font-size" min="24" max="96" value="36" step="1">
+                </div>
+                
+                <div class="control-group">
+                    <label for="scroll-speed">Scroll Speed: <span id="scroll-speed-value" class="control-value">0.50</span></label>
+                    <input type="range" id="scroll-speed" min="0.01" max="2" value="0.5" step="0.01">
+                </div>
+                
+                <div class="switch-container">
+                    <label class="switch">
+                        <input type="checkbox" id="mirror-toggle">
+                        <span class="slider"></span>
+                    </label>
+                    <span>Mirror Text</span>
+                </div>
+                
+                
+            </div>
+        </div>
+        
+        <!-- Scroll Mode -->
+        <div id="scroll-mode" class="scroll-container">
+            <div id="scroll-text-container" class="scroll-text-container">
+                <div id="scroll-text" class="scroll-text"></div>
+            </div>
+            
+            <!-- Side Controls - Now on the left side -->
+            <div class="side-controls">
+                <!-- Playback controls -->
+                <button id="pause-button" class="control-button">⏸️</button>
+                <button id="replay-button" class="control-button">⏫</button>
+                <button id="edit-button" class="control-button">✏️</button>
+                
+                <div class="control-divider"></div>
+                
+                <!-- Font size controls -->
+                <button id="font-increase" class="control-button">A+</button>
+                <button id="font-decrease" class="control-button">A-</button>
+                
+                <div class="control-divider"></div>
+                
+                <!-- Speed controls -->
+                <button id="speed-increase" class="control-button">🐇</button>
+                <button id="speed-decrease" class="control-button">🐢</button>
+                
+                <div class="control-divider"></div>
+                
+                <!-- Mirror control -->
+                <button id="mirror-button" class="control-button">↔️</button>
+            </div>
+            
+            <!-- Floating values display -->
+            <div id="values-display" class="values-display">
+                <p>Font Size: <span id="current-font-size">36</span>px</p>
+                <p>Scroll Speed: <span id="current-scroll-speed">0.50</span></p>
+            </div>
+        </div>
+        <!-- Wake lock indicator -->
+        <div id="wake-lock-indicator" class="wake-lock-indicator">
+        Screen will stay on in this mode
+        </div>
+    </main>
+
+    <footer>
+        <p>MakeItScroll &copy; <span id="current-year"></span> <a href="google.com">by hammel-c</a></p> 
+    </footer>
+    <!-- Hidden video for fallback wake lock -->
+    <video width="10" height="10" id="wake-lock-video" playsinline loop muted>
+        <source src="data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAAr9tZGF0AAACoAYF//+c3EXpvebZSLeWLNgg2SPu73gyNjQgLSBjb3JlIDEyNSAtIEguMjY0L01QRUctNCBBVkMgY29kZWMgLSBDb3B5bGVmdCAyMDAzLTIwMTIgLSBodHRwOi8vd3d3LnZpZGVvbGFuLm9yZy94MjY0Lmh0bWwgLSBvcHRpb25zOiBjYWJhYz0xIHJlZj0zIGRlYmxvY2s9MTowOjAgYW5hbHlzZT0weDM6MHgxMTMgbWU9aGV4IHN1Ym1lPTcgcHN5PTEgcHN5X3JkPTEuMDA6MC4wMCBtaXhlZF9yZWY9MSBtZV9yYW5nZT0xNiBjaHJvbWFfbWU9MSB0cmVsbGlzPTEgOHg4ZGN0PTEgY3FtPTAgZGVhZHpvbmU9MjEsMTEgZmFzdF9wc2tpcD0xIGNocm9tYV9xcF9vZmZzZXQ9LTIgdGhyZWFkcz02IGxvb2thaGVhZF90aHJlYWRzPTEgc2xpY2VkX3RocmVhZHM9MCBucj0wIGRlY2ltYXRlPTEgaW50ZXJsYWNlZD0wIGJsdXJheV9jb21wYXQ9MCBjb25zdHJhaW5lZF9pbnRyYT0wIGJmcmFtZXM9MyBiX3B5cmFtaWQ9MiBiX2FkYXB0PTEgYl9iaWFzPTAgZGlyZWN0PTEgd2VpZ2h0Yj0xIG9wZW5fZ29wPTAgd2VpZ2h0cD0yIGtleWludD0yNTAga2V5aW50X21pbj0yNCBzY2VuZWN1dD00MCBpbnRyYV9yZWZyZXNoPTAgcmNfbG9va2FoZWFkPTQwIHJjPWNyZiBtYnRyZWU9MSBjcmY9MjMuMCBxY29tcD0wLjYwIHFwbWluPTAgcXBtYXg9NjkgcXBzdGVwPTQgaXBfcmF0aW89MS40MCBhcT0xOjEuMDAAgAAAAA9liIQAV/0TAAYdeBTXzg8AAALvbW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAACoAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAhl0cmFrAAAAXHRraGQAAAAPAAAAAAAAAAAAAAABAAAAAAAAACoAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAgAAAAIAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAAqAAAAAAABAAAAAAGRbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAwAAAAAgBVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABPG1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAPxzdGJsAAAAmHN0c2QAAAAAAAAAAQAAAIhhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAgACABIAAAASAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGP//AAAAMmF2Y0MBZAAK/+EAGWdkAAqs2V+WXAWyAAADAAIAAAMAYB4kSywBAAZo6+PLIsAAAAAYc3R0cwAAAAAAAAABAAAAAQAAAgAAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAEAAAABAAAAFHN0c3oAAAAAAAACtwAAAAEAAAAUc3RjbwAAAAAAAAABAAAAMAAAAGJ1ZHRhAAAAWm1ldGEAAAAAAAAAIWhkbHIAAAAAAAAAAG1kaXJhcHBsAAAAAAAAAAAAAAAALWlsc3QAAAAlqXRvbwAAAB1kYXRhAAAAAQAAAABMYXZmNTQuNjMuMTA0">
+        </source> 
+    </video>
+    <script>
+        // DOM Elements
+        const editMode = document.getElementById('edit-mode');
+        const scrollMode = document.getElementById('scroll-mode');
+        const textInput = document.getElementById('text-input');
+        const scrollText = document.getElementById('scroll-text');
+        const scrollTextContainer = document.getElementById('scroll-text-container');
+        
+        const fontSizeSlider = document.getElementById('font-size');
+        const fontSizeValue = document.getElementById('font-size-value');
+        const scrollSpeedSlider = document.getElementById('scroll-speed');
+        const scrollSpeedValue = document.getElementById('scroll-speed-value');
+        const mirrorToggle = document.getElementById('mirror-toggle');
+        
+        const startButton = document.getElementById('start-button');
+        const pauseButton = document.getElementById('pause-button');
+        const replayButton = document.getElementById('replay-button');
+        const editButton = document.getElementById('edit-button');
+        
+        const fontIncreaseButton = document.getElementById('font-increase');
+        const fontDecreaseButton = document.getElementById('font-decrease');
+        const speedIncreaseButton = document.getElementById('speed-increase');
+        const speedDecreaseButton = document.getElementById('speed-decrease');
+        const mirrorButton = document.getElementById('mirror-button');
+        
+        const valuesDisplay = document.getElementById('values-display');
+        const currentFontSize = document.getElementById('current-font-size');
+        const currentScrollSpeed = document.getElementById('current-scroll-speed');
+        
+        const currentYearSpan = document.getElementById('current-year');
+
+        const wakeLockIndicator = document.getElementById('wake-lock-indicator');
+        const wakeLockVideo = document.getElementById('wake-lock-video');
+
+        const footer = document.querySelector('footer');
+        
+        // State variables
+        let fontSize = 36;
+        let scrollSpeed = 0.5; // Default to 0.5 for slower scrolling
+        let isMirrored = false;
+        let isScrolling = false;
+        let isPaused = false;
+        let animationFrameId = null;
+        let isDragging = false;
+        let lastClientY = 0;
+        let lastScrollPosition = 0;
+        let lastTimestamp = 0;
+        let currentScrollPosition = 0;
+        let fadeTimeout = null;
+
+        let wakeLockFadeTimeout = null;
+        let wakeLock = null;
+        
+        // Initialize
+        function init() {
+            // Set current year in footer
+            currentYearSpan.textContent = new Date().getFullYear();
+            
+            // Update values from sliders
+            updateFontSize();
+            updateScrollSpeed();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Initialize auto-resize for textarea
+            initAutoResize();
+        }
+        
+        // Auto-resize textarea function
+        function initAutoResize() {
+            // Initial resize
+            adjustTextareaHeight();
+            
+            // Add event listeners for content changes
+            textInput.addEventListener('input', adjustTextareaHeight);
+            textInput.addEventListener('paste', function() {
+                // Use setTimeout to ensure content is pasted before adjusting
+                setTimeout(adjustTextareaHeight, 0);
+            });
+            
+            // Also adjust when window is resized (for responsive layouts)
+            window.addEventListener('resize', adjustTextareaHeight);
+        }
+        
+        function adjustTextareaHeight() {
+            // Reset height to auto to get the correct scrollHeight
+            textInput.style.height = 'auto';
+            
+            // Set the height to scrollHeight + some padding
+            textInput.style.height = (textInput.scrollHeight) + 'px';
+        }
+        
+        // Show values display with fade effect
+        function showValuesDisplay() {
+            // Clear any existing timeout
+            if (fadeTimeout) {
+                clearTimeout(fadeTimeout);
+            }
+            
+            // Make the display visible
+            valuesDisplay.classList.add('visible');
+            
+            // Set a timeout to fade it out after 3 seconds
+            fadeTimeout = setTimeout(() => {
+                valuesDisplay.classList.remove('visible');
+            }, 3000);
+        }
+        
+        // Event listeners
+        function setupEventListeners() {
+            // Edit mode controls
+            fontSizeSlider.addEventListener('input', updateFontSize);
+            scrollSpeedSlider.addEventListener('input', updateScrollSpeed);
+            mirrorToggle.addEventListener('change', updateMirrorMode);
+            startButton.addEventListener('click', startScrolling);
+
+            
+            
+            // Scroll mode controls
+            pauseButton.addEventListener('click', togglePause);
+            replayButton.addEventListener('click', replayText);
+            editButton.addEventListener('click', returnToEditMode);
+            
+            fontIncreaseButton.addEventListener('click', () => {
+                fontSize = Math.min(fontSize + 2, 96);
+                scrollText.style.fontSize = `${fontSize}px`;
+                // Update the slider in edit mode to maintain consistency
+                fontSizeSlider.value = fontSize;
+                fontSizeValue.textContent = fontSize;
+                // Update the floating display
+                currentFontSize.textContent = fontSize;
+                // Show the values display
+                showValuesDisplay();
+            });
+            
+            fontDecreaseButton.addEventListener('click', () => {
+                fontSize = Math.max(fontSize - 2, 24);
+                scrollText.style.fontSize = `${fontSize}px`;
+                // Update the slider in edit mode to maintain consistency
+                fontSizeSlider.value = fontSize;
+                fontSizeValue.textContent = fontSize;
+                // Update the floating display
+                currentFontSize.textContent = fontSize;
+                // Show the values display
+                showValuesDisplay();
+            });
+            
+            speedIncreaseButton.addEventListener('click', () => {
+                // Use 0.05 increments for the buttons
+                scrollSpeed = Math.min(scrollSpeed + 0.05, 2);
+                scrollSpeed = parseFloat(scrollSpeed.toFixed(2)); // Round to 2 decimal places
+                // Update the slider in edit mode to maintain consistency
+                scrollSpeedSlider.value = scrollSpeed;
+                scrollSpeedValue.textContent = scrollSpeed.toFixed(2);
+                // Update the floating display
+                currentScrollSpeed.textContent = scrollSpeed.toFixed(2);
+                // Show the values display
+                showValuesDisplay();
+                console.log("Speed increased to:", scrollSpeed);
+            });
+            
+            speedDecreaseButton.addEventListener('click', () => {
+                // Use 0.05 decrements for the buttons
+                scrollSpeed = Math.max(scrollSpeed - 0.05, 0.01);
+                scrollSpeed = parseFloat(scrollSpeed.toFixed(2)); // Round to 2 decimal places
+                // Update the slider in edit mode to maintain consistency
+                scrollSpeedSlider.value = scrollSpeed;
+                scrollSpeedValue.textContent = scrollSpeed.toFixed(2);
+                // Update the floating display
+                currentScrollSpeed.textContent = scrollSpeed.toFixed(2);
+                // Show the values display
+                showValuesDisplay();
+                console.log("Speed decreased to:", scrollSpeed);
+            });
+            
+            mirrorButton.addEventListener('click', () => {
+                isMirrored = !isMirrored;
+                scrollText.classList.toggle('mirrored', isMirrored);
+                // Update the toggle in edit mode to maintain consistency
+                mirrorToggle.checked = isMirrored;
+            });
+            
+            // Mouse wheel scrolling
+            scrollTextContainer.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                
+                // If auto-scrolling, stop it when user manually scrolls
+                if (isScrolling && !isPaused) {
+                    pauseScrolling();
+                }
+                
+                scrollTextContainer.scrollTop += e.deltaY;
+                currentScrollPosition = scrollTextContainer.scrollTop;
+            });
+            
+            // Mouse drag scrolling
+            scrollTextContainer.addEventListener('mousedown', (e) => {
+                // If auto-scrolling, stop it when user manually scrolls
+                if (isScrolling && !isPaused) {
+                    pauseScrolling();
+                }
+                
+                isDragging = true;
+                lastClientY = e.clientY;
+                lastScrollPosition = scrollTextContainer.scrollTop;
+                scrollTextContainer.style.cursor = 'grabbing';
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    const deltaY = lastClientY - e.clientY;
+                    scrollTextContainer.scrollTop = lastScrollPosition + deltaY;
+                    currentScrollPosition = scrollTextContainer.scrollTop;
+                }
+            });
+            
+            document.addEventListener('mouseup', () => {
+                isDragging = false;
+                scrollTextContainer.style.cursor = 'grab';
+            });
+            
+            // Touch events for mobile
+            scrollTextContainer.addEventListener('touchstart', (e) => {
+                // If auto-scrolling, stop it when user manually scrolls
+                if (isScrolling && !isPaused) {
+                    pauseScrolling();
+                }
+                
+                isDragging = true;
+                lastClientY = e.touches[0].clientY;
+                lastScrollPosition = scrollTextContainer.scrollTop;
+            });
+            
+            scrollTextContainer.addEventListener('touchmove', (e) => {
+                if (isDragging) {
+                    const deltaY = lastClientY - e.touches[0].clientY;
+                    scrollTextContainer.scrollTop = lastScrollPosition + deltaY;
+                    currentScrollPosition = scrollTextContainer.scrollTop;
+                    e.preventDefault(); // Prevent page scrolling
+                }
+            });
+            
+            scrollTextContainer.addEventListener('touchend', () => {
+                isDragging = false;
+            });
+        }
+        
+        // Update functions
+        function updateFontSize() {
+            fontSize = parseInt(fontSizeSlider.value);
+            fontSizeValue.textContent = fontSize;
+            // Update the floating display if in scroll mode
+            currentFontSize.textContent = fontSize;
+            // Show the values display if in scroll mode
+            if (scrollMode.style.display === 'block') {
+                showValuesDisplay();
+            }
+        }
+        
+        function updateScrollSpeed() {
+            scrollSpeed = parseFloat(scrollSpeedSlider.value);
+            scrollSpeedValue.textContent = scrollSpeed.toFixed(2); // Display with 2 decimal places
+            // Update the floating display if in scroll mode
+            currentScrollSpeed.textContent = scrollSpeed.toFixed(2);
+            // Show the values display if in scroll mode
+            if (scrollMode.style.display === 'block') {
+                showValuesDisplay();
+            }
+        }
+        
+        function updateMirrorMode() {
+            isMirrored = mirrorToggle.checked;
+        }
+        
+        // Smooth scrolling animation using requestAnimationFrame
+        function animateScroll(timestamp) {
+            if (!lastTimestamp) lastTimestamp = timestamp;
+            
+            // Calculate time elapsed since last frame
+            const elapsed = timestamp - lastTimestamp;
+            
+            // Calculate how much to scroll based on time and speed
+            // Multiply by a factor to make even slow speeds visible
+            const scrollAmount = (scrollSpeed * elapsed) / 10; // Adjusted for slower speeds
+            
+            // Update scroll position
+            currentScrollPosition += scrollAmount;
+            scrollTextContainer.scrollTop = currentScrollPosition;
+            
+            // Save timestamp for next frame
+            lastTimestamp = timestamp;
+            
+            // Continue animation if not paused
+            if (isScrolling && !isPaused) {
+                animationFrameId = requestAnimationFrame(animateScroll);
+            }
+        }
+        
+        // Mode switching
+        function startScrolling() {
+            // Copy text from input to scroll view
+            scrollText.textContent = textInput.value;
+            
+            // Apply styles
+            scrollText.style.fontSize = `${fontSize}px`;
+            scrollText.classList.toggle('mirrored', isMirrored);
+            
+            // Switch modes
+            editMode.style.display = 'none';
+            scrollMode.style.display = 'block';
+            
+            // Show the values display initially
+            currentFontSize.textContent = fontSize;
+            currentScrollSpeed.textContent = scrollSpeed.toFixed(2);
+            showValuesDisplay();
+            
+            // Reset scroll position
+            scrollTextContainer.scrollTop = 0;
+            currentScrollPosition = 0;
+            
+            // Start scrolling
+            isScrolling = true;
+            isPaused = false;
+            lastTimestamp = 0;
+
+            // Enable wake lock to prevent screen from turning off
+enableWakeLock();
+
+// Hide footer in scroll mode
+footer.style.display = 'none';
+            
+            // Start animation
+            animationFrameId = requestAnimationFrame(animateScroll);
+            
+            // Update pause button text
+            pauseButton.innerHTML = '⏸️';
+        }
+        
+        function returnToEditMode() {
+            // Stop scrolling
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+            isScrolling = false;
+
+            // Release wake lock
+releaseWakeLock();
+            
+            // Clear any fade timeout
+            if (fadeTimeout) {
+                clearTimeout(fadeTimeout);
+                fadeTimeout = null;
+            }
+            
+            // Switch modes
+            scrollMode.style.display = 'none';
+            editMode.style.display = 'block';
+            
+            // Re-adjust textarea height in case content changed
+            setTimeout(adjustTextareaHeight, 0);
+            // Show footer again
+footer.style.display = 'block';
+        }
+        
+        // Replay function - reset to top without auto-scrolling
+        function replayText() {
+            // Pause scrolling if it's active
+            if (isScrolling && !isPaused) {
+                pauseScrolling();
+            }
+            
+            // Reset scroll position
+            scrollTextContainer.scrollTop = 0;
+            currentScrollPosition = 0;
+        }
+        
+        // Scrolling controls
+        function togglePause() {
+            isPaused = !isPaused;
+            
+            if (isPaused) {
+                pauseScrolling();
+            } else {
+                resumeScrolling();
+            }
+        }
+        
+        function pauseScrolling() {
+            isPaused = true;
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+            pauseButton.innerHTML = '▶️';
+        }
+        
+        function resumeScrolling() {
+            isPaused = false;
+            lastTimestamp = 0; // Reset timestamp to avoid jumps
+            currentScrollPosition = scrollTextContainer.scrollTop; // Start from current position
+            animationFrameId = requestAnimationFrame(animateScroll);
+            pauseButton.innerHTML = '⏸️';
+        }
+        
+        // Show wake lock indicator with fade effect
+function showWakeLockIndicator() {
+    // Clear any existing timeout
+    if (wakeLockFadeTimeout) {
+        clearTimeout(wakeLockFadeTimeout);
+    }
+    
+    // Make the indicator visible
+    wakeLockIndicator.classList.add('visible');
+    
+    // Set a timeout to fade it out after 5 seconds
+    wakeLockFadeTimeout = setTimeout(() => {
+        wakeLockIndicator.classList.remove('visible');
+    }, 5000);
+}
+
+// Wake Lock API functions
+async function requestWakeLock() {
+    // Check if the Wake Lock API is supported
+    if ('wakeLock' in navigator) {
+        try {
+            // Request a screen wake lock
+            wakeLock = await navigator.wakeLock.request('screen');
+            
+            // Show indicator
+            showWakeLockIndicator();
+            
+            // Listen for wake lock release
+            wakeLock.addEventListener('release', () => {
+                console.log('Wake Lock was released');
+                // Try to reacquire the wake lock if we're still in scroll mode
+                if (scrollMode.style.display === 'block') {
+                    requestWakeLock();
+                }
+            });
+            
+            console.log('Wake Lock is active');
+            return true;
+        } catch (err) {
+            console.error(`Failed to get wake lock: ${err.message}`);
+            return false;
+        }
+    }
+    return false;
+}
+
+// Fallback method for browsers that don't support Wake Lock API
+function enableFallbackWakeLock() {
+    try {
+        // Play the silent video to keep the screen awake
+        wakeLockVideo.play().then(() => {
+            console.log('Fallback wake lock enabled');
+            showWakeLockIndicator();
+        }).catch(err => {
+            console.error('Failed to play wake lock video:', err);
+        });
+        return true;
+    } catch (err) {
+        console.error('Fallback wake lock failed:', err);
+        return false;
+    }
+}
+
+// Enable screen wake lock using available methods
+async function enableWakeLock() {
+    // Try the Wake Lock API first
+    const apiSuccess = await requestWakeLock();
+    
+    // If Wake Lock API failed or isn't supported, try the fallback
+    if (!apiSuccess) {
+        enableFallbackWakeLock();
+    }
+}
+
+// Release wake lock
+function releaseWakeLock() {
+    // Release Wake Lock API if active
+    if (wakeLock) {
+        wakeLock.release()
+            .then(() => {
+                wakeLock = null;
+                console.log('Wake Lock released');
+            })
+            .catch((err) => {
+                console.error(`Error releasing wake lock: ${err.message}`);
+            });
+    }
+    
+    // Stop the fallback video
+    wakeLockVideo.pause();
+    
+    // Hide the indicator
+    wakeLockIndicator.classList.remove('visible');
+    
+    // Clear any fade timeout
+    if (wakeLockFadeTimeout) {
+        clearTimeout(wakeLockFadeTimeout);
+        wakeLockFadeTimeout = null;
+    }
+}
+        // Initialize the app
+        init();
+    </script>
+</body>
+</html>

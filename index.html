@@ -26,6 +26,7 @@
         
         /* Sideways mode - rotate the entire body */
         body.sideways {
+            min-height: 0vh;
             transform: rotate(90deg);
             transform-origin: bottom left;
             width: 100vh;
@@ -41,7 +42,7 @@
         main {
             flex: 1;
             padding: 1rem;
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
             width: 100%;
         }
@@ -426,17 +427,18 @@ a{
     }
 }
 /* Add these new media queries after your existing @media (max-width: 768px) section */
-@media (max-height: 500px) {
+@media (max-height: 600px) {
     .side-controls {
         padding: 8px;
         gap: 7px;
-        max-height: 95vh;
+        max-height: 90vh;
     }
     
     .control-button {
         width: 35px;
         height: 35px;
         font-size: 1rem;
+        background-color: #00000000;
     }
     
     .control-divider {
@@ -545,7 +547,7 @@ Check the little foofter for the code on Github.
     </main>
 
     <footer>
-        <p>MakeItScroll &copy; <span id="current-year"></span> <a href="https://github.com/hammel-c/MakeItScroll"> by hammel-c</a> ver.1.0.2</p> 
+        <p>MakeItScroll &copy; <span id="current-year"></span> <a href="https://github.com/hammel-c/MakeItScroll"> by hammel-c</a> ver.1.0.3</p> 
     </footer>
     <!-- Hidden video for fallback wake lock -->
     <video width="10" height="10" id="wake-lock-video" playsinline loop muted>
@@ -780,8 +782,8 @@ Check the little foofter for the code on Github.
                     if (isSideways) {
                         // In sideways mode, use horizontal movement (X) for scrolling
                         const deltaX = e.clientX - lastClientX;
-                        // Reverse the direction for more natural feel in sideways mode
-                        scrollTextContainer.scrollTop = lastScrollPosition - deltaX;
+                        // Use positive deltaX for more natural feel in sideways mode
+                        scrollTextContainer.scrollTop = lastScrollPosition + deltaX;
                     } else {
                         // Normal mode - use vertical movement (Y)
                         const deltaY = lastClientY - e.clientY;
@@ -814,8 +816,8 @@ Check the little foofter for the code on Github.
                     if (isSideways) {
                         // In sideways mode, use horizontal movement (X) for scrolling
                         const deltaX = e.touches[0].clientX - lastClientX;
-                        // Reverse the direction for more natural feel in sideways mode
-                        scrollTextContainer.scrollTop = lastScrollPosition - deltaX;
+                        // Use positive deltaX for more natural feel in sideways mode
+                        scrollTextContainer.scrollTop = lastScrollPosition + deltaX;
                     } else {
                         // Normal mode - use vertical movement (Y)
                         const deltaY = lastClientY - e.touches[0].clientY;
@@ -1102,4 +1104,3 @@ Check the little foofter for the code on Github.
     </script>
 </body>
 </html>
-

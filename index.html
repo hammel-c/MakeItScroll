@@ -54,7 +54,17 @@
             height: 100vw;
             align-items: center;
         }
-        
+        body.sideways .control-button {
+            width: 35px;
+            height: 35px;
+            font-size: 1rem;
+            background-color: #00000000;
+        }
+        body.sideways .side-controls {
+            padding: 5px;
+            gap: 5px;
+            max-height: 95vh;
+        }
         /* Footer styles */
         footer {
             background-color: #000000;
@@ -87,6 +97,15 @@ a{
     color: #2196F3;
 }
         /* Edit mode styles */
+        #edit-mode {
+            padding: 1vh;        
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        body.sideways #edit-mode {
+            padding: 5vh;        
+        }
         
         #text-input {
             width: 100%;
@@ -220,15 +239,16 @@ a{
         
         /* Scroll mode styles */
         .scroll-container {
-            display: none;
-            height: calc(100vh - 40px);
-            position: relative;
-            background-color: #000000; /* Black background for teleprompter */
-            border-radius: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-            width: 100%;
-        }
+    display: none;
+    height: calc(100vh - 40px);
+    position: relative;
+    background-color: #000000; /* Black background for teleprompter */
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    width: 100%;
+    align-self: stretch; /* Take full height of parent */
+}
         
         /* Adjust scroll container in sideways mode */
         body.sideways .scroll-container {
@@ -316,7 +336,7 @@ a{
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #333; /* Darker button background */
+            background-color: #000000; /* Darker button background */
             color: #fff; /* White text/icon */
             border: none;
             cursor: pointer;
@@ -325,7 +345,7 @@ a{
         }
         
         .control-button:hover {
-            background-color: #444; /* Slightly lighter on hover */
+            background-color: #333; /* Slightly lighter on hover */
         }
         
         .control-divider {
@@ -427,18 +447,17 @@ a{
     }
 }
 /* Add these new media queries after your existing @media (max-width: 768px) section */
-@media (max-height: 600px) {
+@media (max-height: 500px) {
     .side-controls {
         padding: 8px;
         gap: 7px;
-        max-height: 90vh;
+        max-height: 95vh;
     }
     
     .control-button {
         width: 35px;
         height: 35px;
         font-size: 1rem;
-        background-color: #00000000;
     }
     
     .control-divider {
@@ -456,7 +475,7 @@ a{
             <div class="edit-container">
                 <textarea id="text-input" placeholder="Enter your teleprompter text here...">
                     
-MakeItScroll – the quick  and opens source Teleprompter tool
+MakeItScroll – the quick and open source Teleprompter tool
 
 You can set the font size, scroll speed and toggle mirror mode to use on a real mirror teleprompter.
                     
@@ -522,16 +541,6 @@ Check the little foofter for the code on Github.
                 <!-- Speed controls -->
                 <button id="speed-increase" class="control-button">🐇</button>
                 <button id="speed-decrease" class="control-button">🐢</button>
-                
-                <div class="control-divider"></div>
-                
-                <!-- Mirror control -->
-                <button id="mirror-button" class="control-button">↔️</button>
-                
-                <div class="control-divider"></div>
-                
-                <!-- Sideways control -->
-                <button id="sideways-button" class="control-button">📱</button>
             </div>
             
             <!-- Floating values display -->
@@ -578,8 +587,6 @@ Check the little foofter for the code on Github.
         const fontDecreaseButton = document.getElementById('font-decrease');
         const speedIncreaseButton = document.getElementById('speed-increase');
         const speedDecreaseButton = document.getElementById('speed-decrease');
-        const mirrorButton = document.getElementById('mirror-button');
-        const sidewaysButton = document.getElementById('sideways-button');
         
         const valuesDisplay = document.getElementById('values-display');
         const currentFontSize = document.getElementById('current-font-size');
@@ -734,20 +741,6 @@ Check the little foofter for the code on Github.
                 // Show the values display
                 showValuesDisplay();
                 console.log("Speed decreased to:", scrollSpeed);
-            });
-            
-            mirrorButton.addEventListener('click', () => {
-                isMirrored = !isMirrored;
-                scrollText.classList.toggle('mirrored', isMirrored);
-                // Update the toggle in edit mode to maintain consistency
-                mirrorToggle.checked = isMirrored;
-            });
-            
-            sidewaysButton.addEventListener('click', () => {
-                isSideways = !isSideways;
-                body.classList.toggle('sideways', isSideways);
-                // Update the toggle in edit mode to maintain consistency
-                sidewaysToggle.checked = isSideways;
             });
             
             // Mouse wheel scrolling

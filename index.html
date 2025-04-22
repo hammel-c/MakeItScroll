@@ -34,8 +34,8 @@
             position: absolute;
             top: -100vw;
             left: 0;
-            overflow-x: hidden;
-            overflow-y: auto;
+            overflow-x: scroll;
+            overflow-y: scroll;
         }
         
         /* Main content styles */
@@ -74,28 +74,28 @@
             font-size: 0.8rem;
         }
         /* width */
-::-webkit-scrollbar {
-  width: 10px;
-}
+        ::-webkit-scrollbar {
+        width: 10px;
+        }
 
-/* Track */
-::-webkit-scrollbar-track {
-  background: #000000; 
-}
- 
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: #555555; 
-}
+        /* Track */
+        ::-webkit-scrollbar-track {
+        background: #000000; 
+        }
+        
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+        background: #555555; 
+        }
 
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: #555; 
-}
-a{
-    text-decoration: none;
-    color: #2196F3;
-}
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+        background: #555; 
+        }
+        a{
+            text-decoration: none;
+            color: #2196F3;
+        }
         /* Edit mode styles */
         #edit-mode {
             padding: 1vh;        
@@ -203,18 +203,18 @@ a{
         input:checked + .slider:before {
             transform: translateX(26px);
         }
-        
-        .toggles-container {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    margin: 1rem 0;
-}
 
-.toggles-container .switch-container {
-    margin: 0;
-    flex: 1;
-}
+        .toggles-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        margin: 1rem 0;
+        }
+
+        .toggles-container .switch-container {
+            margin: 0;
+            flex: 1;
+        }
         
         button {
             font-family: monospace;
@@ -239,16 +239,16 @@ a{
         
         /* Scroll mode styles */
         .scroll-container {
-    display: none;
-    height: calc(100vh - 40px);
-    position: relative;
-    background-color: #000000; /* Black background for teleprompter */
-    border-radius: 20px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
-    width: 100%;
-    align-self: stretch; /* Take full height of parent */
-}
+        display: none;
+        height: calc(100vh - 40px);
+        position: relative;
+        background-color: #000000; /* Black background for teleprompter */
+        border-radius: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+        width: 100%;
+        align-self: stretch; /* Take full height of parent */
+        }
         
         /* Adjust scroll container in sideways mode */
         body.sideways .scroll-container {
@@ -408,62 +408,62 @@ a{
             }
         }
         /* Wake lock indicator */
-.wake-lock-indicator {
-    position: fixed;
-    right: 20px;
-    top: 20px;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 8px 12px;
-    border-radius: 10px;
-    font-size: 0.8rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-    z-index: 100;
-    opacity: 0;
-    transition: opacity 0.5s ease;
-    pointer-events: none;
-}
-
-.wake-lock-indicator.visible {
-    opacity: 1;
-}
-
-/* Hidden video for fallback wake lock */
-#wake-lock-video {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    opacity: 0.01;
-    pointer-events: none;
-}
-
-/* Add this to your responsive styles section */
-@media (max-width: 768px) {
-    .wake-lock-indicator {
-        top: 10px;
-        right: 10px;
-        font-size: 0.8rem;
+        .wake-lock-indicator {
+        position: fixed;
+        right: 20px;
+        top: 20px;
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
         padding: 8px 12px;
-    }
-}
-/* Add these new media queries after your existing @media (max-width: 768px) section */
-@media (max-height: 500px) {
-    .side-controls {
-        padding: 8px;
-        gap: 7px;
-        max-height: 95vh;
-    }
-    
-    .control-button {
-        width: 35px;
-        height: 35px;
-        font-size: 1rem;
-    }
-    
-    .control-divider {
-        margin: 0px 0;
-    }
-}
+        border-radius: 10px;
+        font-size: 0.8rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        z-index: 100;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        pointer-events: none;
+        }
+
+        .wake-lock-indicator.visible {
+            opacity: 1;
+        }
+
+        /* Hidden video for fallback wake lock */
+        #wake-lock-video {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            opacity: 0.01;
+            pointer-events: none;
+        }
+
+        /* Add this to your responsive styles section */
+        @media (max-width: 768px) {
+            .wake-lock-indicator {
+                top: 10px;
+                right: 10px;
+                font-size: 0.8rem;
+                padding: 8px 12px;
+            }
+        }
+        /* Add these new media queries after your existing @media (max-width: 768px) section */
+        @media (max-height: 500px) {
+            .side-controls {
+                padding: 8px;
+                gap: 7px;
+                max-height: 95vh;
+            }
+            
+            .control-button {
+                width: 35px;
+                height: 35px;
+                font-size: 1rem;
+            }
+            
+            .control-divider {
+                margin: 0px 0;
+            }
+        }
 
     </style>
 </head>
@@ -472,19 +472,6 @@ a{
         <!-- Edit Mode -->
         <div id="edit-mode">
             <button id="start-button">MakeItScroll</button>
-            <div class="edit-container">
-                <textarea id="text-input" placeholder="Enter your teleprompter text here...">
-                    
-MakeItScroll – the quick and open source Teleprompter tool
-
-You can set the font size, scroll speed and toggle mirror mode to use on a real mirror teleprompter.
-                    
-When you're ready, click "MakeItScroll" to start the teleprompter.
-                    
-Check the little foofter for the code on Github.
-                </textarea>
-            </div>
-            
             <div class="controls">
                 <div class="control-group">
                     <label for="font-size">Font Size: <span id="font-size-value" class="control-value">36</span>px</label>
@@ -513,7 +500,18 @@ Check the little foofter for the code on Github.
                         <span>Force Sideways</span>
                     </div>
                 </div>
-                
+            </div>
+            <div class="edit-container">
+                <textarea id="text-input" placeholder="Enter your teleprompter text here...">
+                    
+MakeItScroll – the quick and open source Teleprompter tool
+
+You can set the font size, scroll speed and toggle mirror mode to use on a real mirror teleprompter.
+                    
+When you're ready, click "MakeItScroll" to start the teleprompter.
+                    
+Check the little foofter for the code on Github.
+                </textarea>
             </div>
         </div>
         
@@ -556,7 +554,7 @@ Check the little foofter for the code on Github.
     </main>
 
     <footer>
-        <p>MakeItScroll &copy; <span id="current-year"></span> <a href="https://github.com/hammel-c/MakeItScroll"> by hammel-c</a> ver.1.0.3</p> 
+        <p>MakeItScroll &copy; <span id="current-year"></span> <a href="https://github.com/hammel-c/MakeItScroll"> by hammel-c</a> ver.1.0.5</p> 
     </footer>
     <!-- Hidden video for fallback wake lock -->
     <video width="10" height="10" id="wake-lock-video" playsinline loop muted>

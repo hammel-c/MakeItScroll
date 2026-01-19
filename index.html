@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>MakeItScroll — Teleprompter</title>
     <style>
         /* Reset and base styles */
@@ -250,11 +250,10 @@
         align-self: stretch; /* Take full height of parent */
         }
         
-        /* Adjust scroll container in sideways mode */
         body.sideways .scroll-container {
-            height: calc(100vw - 40px);
-            width: 100vh;
+            width: 98vw;
             margin: 0 auto;
+            align-self: anchor-center;
         }
         
         .scroll-text-container {
@@ -280,7 +279,10 @@
         /* Adjust scroll text container in sideways mode */
         body.sideways .scroll-text-container {
             padding-left: 80px;
-            padding-right: 20px;
+            /* Increase padding-right to 60px to clear Android nav buttons */
+            padding-right: 60px; 
+            /* Also add safe area padding just in case */
+            padding-right: calc(60px + env(safe-area-inset-bottom));
         }
         
         .scroll-text-container:active {

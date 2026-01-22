@@ -80,17 +80,17 @@
 
         /* Track */
         ::-webkit-scrollbar-track {
-        background: #000000; 
+        background: #000000;
         }
         
         /* Handle */
         ::-webkit-scrollbar-thumb {
-        background: #555555; 
+        background: #555555;
         }
 
         /* Handle on hover */
         ::-webkit-scrollbar-thumb:hover {
-        background: #555; 
+        background: #555;
         }
         a{
             text-decoration: none;
@@ -98,13 +98,13 @@
         }
         /* Edit mode styles */
         #edit-mode {
-            padding: 1vh;        
+            padding: 1vh;
             width: 100%;
             display: flex;
             flex-direction: column;
         }
         body.sideways #edit-mode {
-            padding: 5vh;        
+            padding: 5vh;
         }
         
         #text-input {
@@ -116,13 +116,17 @@
             background-color: #2d2d2d;
             border: 1px solid #444;
             border-radius: 4px;
-            resize: none; /* Disable manual resizing */
-            overflow-y: hidden; /* Hide scrollbar */
-            line-height: 1.6; /* Match line height for accurate calculations */
+            resize: none;
+            /* Disable manual resizing */
+            overflow-y: hidden;
+            /* Hide scrollbar */
+            line-height: 1.6;
+            /* Match line height for accurate calculations */
         }
         
         .controls {
-            background-color: #1e1e1e; /* Dark gray */
+            background-color: #1e1e1e;
+            /* Dark gray */
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
             padding: 1.5rem;
@@ -205,10 +209,10 @@
         }
 
         .toggles-container {
-        display: flex;
-        justify-content: space-between;
-        gap: 20px;
-        margin: 1rem 0;
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            margin: 1rem 0;
         }
 
         .toggles-container .switch-container {
@@ -216,7 +220,45 @@
             flex: 1;
         }
         
-        button {
+        /* Text Action Buttons Container */
+        .text-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #333;
+        }
+
+        /* Secondary Button Style */
+        .secondary-button {
+            flex: 1;
+            padding: 0.8rem;
+            background-color: #333;
+            color: #e0e0e0;
+            border: 1px solid #555;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            text-align: center;
+            line-height: normal;
+            display: inline-block;
+        }
+
+        .secondary-button:hover {
+            background-color: #444;
+            border-color: #666;
+            transform: translateY(-1px);
+        }
+
+        .secondary-button:active {
+            transform: translateY(1px);
+        }
+        
+        /* Main Action Button */
+        .primary-action-btn {
             font-family: monospace;
             background-color: #2196F3;
             color: white;
@@ -226,15 +268,12 @@
             border-radius: 20px 20px 0px 0px;
             cursor: pointer;
             transition: background-color 0.3s;
-        }
-        
-        button:hover {
-            background-color: #0066ba;
-        }
-        
-        #start-button {
             width: 100%;
             margin-top: 1rem;
+        }
+        
+        .primary-action-btn:hover {
+            background-color: #0066ba;
         }
         
         /* Scroll mode styles */
@@ -247,7 +286,8 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         overflow: hidden;
         width: 100%;
-        align-self: stretch; /* Take full height of parent */
+        align-self: stretch;
+        /* Take full height of parent */
         }
         
         body.sideways .scroll-container {
@@ -258,6 +298,7 @@
             height: 100%;
             overflow-y: auto;
             padding: 2rem;
+            padding-top: 30vh;
             padding-left: 80px; /* Add padding to prevent overlap with controls */
             cursor: grab;
             /* Improve scrolling performance */
@@ -270,15 +311,17 @@
             }
             
             /* Hide scrollbar for IE, Edge and Firefox */
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
+            -ms-overflow-style: none;
+            /* IE and Edge */
+            scrollbar-width: none;
+            /* Firefox */
         }
         
         /* Adjust scroll text container in sideways mode */
         body.sideways .scroll-text-container {
             padding-left: 80px;
             /* Increase padding-right to 60px to clear Android nav buttons */
-            padding-right: 60px; 
+            padding-right: 60px;
             /* Also add safe area padding just in case */
             padding-right: calc(60px + env(safe-area-inset-bottom));
         }
@@ -320,7 +363,8 @@
             padding: 15px;
             border-radius: 15px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-            z-index: 100; /* Ensure controls are above text */
+            z-index: 100;
+            /* Ensure controls are above text */
         }
         
         /* Adjust side controls in sideways mode */
@@ -336,8 +380,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background-color: #000000; /* Darker button background */
-            color: #fff; /* White text/icon */
+            background-color: #000000;
+            /* Darker button background */
+            color: #fff;
+            /* White text/icon */
             border: none;
             cursor: pointer;
             font-size: 1rem;
@@ -345,7 +391,8 @@
         }
         
         .control-button:hover {
-            background-color: #333; /* Slightly lighter on hover */
+            background-color: #333;
+            /* Slightly lighter on hover */
         }
         
         .control-divider {
@@ -366,9 +413,12 @@
             font-size: 0.9rem;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
             z-index: 100;
-            opacity: 0; /* Start invisible */
-            transition: opacity 1.5s ease; /* Smooth fade transition */
-            pointer-events: none; /* Don't interfere with clicks */
+            opacity: 0;
+            /* Start invisible */
+            transition: opacity 1.5s ease;
+            /* Smooth fade transition */
+            pointer-events: none;
+            /* Don't interfere with clicks */
         }
         
         .values-display.visible {
@@ -387,7 +437,8 @@
             }
             
             .side-controls {
-                left: 10px; /* Changed from right to left */
+                left: 10px;
+                /* Changed from right to left */
                 padding: 10px;
             }
             
@@ -397,7 +448,8 @@
             }
             
             .scroll-text-container {
-                padding-left: 60px; /* Smaller padding on mobile */
+                padding-left: 60px;
+                /* Smaller padding on mobile */
             }
             
             .values-display {
@@ -437,7 +489,6 @@
             pointer-events: none;
         }
 
-        /* Add this to your responsive styles section */
         @media (max-width: 768px) {
             .wake-lock-indicator {
                 top: 10px;
@@ -446,7 +497,6 @@
                 padding: 8px 12px;
             }
         }
-        /* Add these new media queries after your existing @media (max-width: 768px) section */
         @media (max-height: 500px) {
             .side-controls {
                 padding: 8px;
@@ -464,14 +514,104 @@
                 margin: 0px 0;
             }
         }
+        
+        /* 1. Move indicators when in sideways mode */
+        body.sideways .values-display,
+        body.sideways .wake-lock-indicator {
+            right: 70px;
+        }
 
+        /* 2. Color classes for the Play/Pause button */
+        #pause-button.playing {
+            background-color: #f443363c;
+            /* Red for Pause (⏸️) */
+        }
+
+        #pause-button.paused {
+            background-color: #4caf4f60;
+            /* Green for Play (▶️) */
+        }
+
+        /* NEW: Custom Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: #1e1e1e;
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            max-width: 350px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            border: 1px solid #333;
+            transform: scale(0.95);
+            transition: transform 0.2s;
+        }
+        
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-message {
+            color: #e0e0e0;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            flex: 1;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+        
+        .modal-btn:hover {
+            opacity: 0.9;
+        }
+
+        .modal-btn-cancel {
+            background-color: #333;
+            color: #ccc;
+            border: 1px solid #444;
+        }
+
+        .modal-btn-confirm {
+            background-color: #2196F3;
+            color: white;
+        }
     </style>
 </head>
 <body>
     <main>
-        <!-- Edit Mode -->
         <div id="edit-mode">
-            <button id="start-button">MakeItScroll</button>
+            <button id="start-button" class="primary-action-btn">MakeItScroll</button>
             <div class="controls">
                 <div class="control-group">
                     <label for="font-size">Font Size: <span id="font-size-value" class="control-value">36</span>px</label>
@@ -479,8 +619,8 @@
                 </div>
                 
                 <div class="control-group">
-                    <label for="scroll-speed">Scroll Speed: <span id="scroll-speed-value" class="control-value">0.50</span></label>
-                    <input type="range" id="scroll-speed" min="0.01" max="2" value="0.5" step="0.01">
+                    <label for="scroll-speed">Scroll Speed: <span id="scroll-speed-value" class="control-value">0.40</span></label>
+                    <input type="range" id="scroll-speed" min="0.01" max="2" value="0.40" step="0.01">
                 </div>
                 
                 <div class="toggles-container">
@@ -500,68 +640,76 @@
                         <span>Force Sideways</span>
                     </div>
                 </div>
+
+                <div class="text-options">
+                    <button type="button" id="clear-text-btn" class="secondary-button">Clear Text</button>
+                    <button type="button" id="restore-text-btn" class="secondary-button">Restore Default</button>
+                </div>
             </div>
+            
             <div class="edit-container">
                 <textarea id="text-input" placeholder="Enter your teleprompter text here...">
-                    
-MakeItScroll – the quick and open source Teleprompter tool
+MakeItScroll – a quick and open source Teleprompter tool
 
 You can set the font size, scroll speed and toggle mirror mode to use on a real mirror teleprompter.
-                    
 When you're ready, click "MakeItScroll" to start the teleprompter.
-                    
-Check the little foofter for the code on Github.
-                </textarea>
+
+Check the little foofter for the code on Github.</textarea>
             </div>
         </div>
         
-        <!-- Scroll Mode -->
         <div id="scroll-mode" class="scroll-container">
             <div id="scroll-text-container" class="scroll-text-container">
                 <div id="scroll-text" class="scroll-text"></div>
             </div>
-            
-            <!-- Side Controls -->
+       
             <div class="side-controls">
-                <!-- Playback controls -->
                 <button id="pause-button" class="control-button">⏸️</button>
                 <button id="replay-button" class="control-button">⏫</button>
                 <button id="edit-button" class="control-button">✏️</button>
                 
                 <div class="control-divider"></div>
                 
-                <!-- Font size controls -->
                 <button id="font-increase" class="control-button">A+</button>
                 <button id="font-decrease" class="control-button">A-</button>
                 
                 <div class="control-divider"></div>
                 
-                <!-- Speed controls -->
                 <button id="speed-increase" class="control-button">🐇</button>
                 <button id="speed-decrease" class="control-button">🐢</button>
             </div>
             
-            <!-- Floating values display -->
             <div id="values-display" class="values-display">
                 <p>Font Size: <span id="current-font-size">36</span>px</p>
                 <p>Scroll Speed: <span id="current-scroll-speed">0.50</span></p>
             </div>
         </div>
-        <!-- Wake lock indicator -->
         <div id="wake-lock-indicator" class="wake-lock-indicator">
         Screen will stay on in this mode
         </div>
     </main>
 
     <footer>
-        <p>MakeItScroll &copy; <span id="current-year"></span> <a href="https://github.com/hammel-c/MakeItScroll"> by hammel-c</a> ver.1.0.6</p> 
+        <p>MakeItScroll &copy;
+        <span id="current-year"></span> <a href="https://github.com/hammel-c/MakeItScroll"> by hammel-c</a> ver.1.0.6</p> 
     </footer>
-    <!-- Hidden video for fallback wake lock -->
     <video width="10" height="10" id="wake-lock-video" playsinline loop muted>
         <source src="data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAAr9tZGF0AAACoAYF//+c3EXpvebZSLeWLNgg2SPu73gyNjQgLSBjb3JlIDEyNSAtIEguMjY0L01QRUctNCBBVkMgY29kZWMgLSBDb3B5bGVmdCAyMDAzLTIwMTIgLSBodHRwOi8vd3d3LnZpZGVvbGFuLm9yZy94MjY0Lmh0bWwgLSBvcHRpb25zOiBjYWJhYz0xIHJlZj0zIGRlYmxvY2s9MTowOjAgYW5hbHlzZT0weDM6MHgxMTMgbWU9aGV4IHN1Ym1lPTcgcHN5PTEgcHN5X3JkPTEuMDA6MC4wMCBtaXhlZF9yZWY9MSBtZV9yYW5nZT0xNiBjaHJvbWFfbWU9MSB0cmVsbGlzPTEgOHg4ZGN0PTEgY3FtPTAgZGVhZHpvbmU9MjEsMTEgZmFzdF9wc2tpcD0xIGNocm9tYV9xcF9vZmZzZXQ9LTIgdGhyZWFkcz02IGxvb2thaGVhZF90aHJlYWRzPTEgc2xpY2VkX3RocmVhZHM9MCBucj0wIGRlY2ltYXRlPTEgaW50ZXJsYWNlZD0wIGJsdXJheV9jb21wYXQ9MCBjb25zdHJhaW5lZF9pbnRyYT0wIGJmcmFtZXM9MyBiX3B5cmFtaWQ9MiBiX2FkYXB0PTEgYl9iaWFzPTAgZGlyZWN0PTEgd2VpZ2h0Yj0xIG9wZW5fZ29wPTAgd2VpZ2h0cD0yIGtleWludD0yNTAga2V5aW50X21pbj0yNCBzY2VuZWN1dD00MCBpbnRyYV9yZWZyZXNoPTAgcmNfbG9va2FoZWFkPTQwIHJjPWNyZiBtYnRyZWU9MSBjcmY9MjMuMCBxY29tcD0wLjYwIHFwbWluPTAgcXBtYXg9NjkgcXBzdGVwPTQgaXBfcmF0aW89MS40MCBhcT0xOjEuMDAAgAAAAA9liIQAV/0TAAYdeBTXzg8AAALvbW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAACoAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAhl0cmFrAAAAXHRraGQAAAAPAAAAAAAAAAAAAAABAAAAAAAAACoAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAgAAAAIAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAAqAAAAAAABAAAAAAGRbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAwAAAAAgBVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABPG1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAPxzdGJsAAAAmHN0c2QAAAAAAAAAAQAAAIhhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAgACABIAAAASAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGP//AAAAMmF2Y0MBZAAK/+EAGWdkAAqs2V+WXAWyAAADAAIAAAMAYB4kSywBAAZo6+PLIsAAAAAYc3R0cwAAAAAAAAABAAAAAQAAAgAAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAEAAAABAAAAFHN0c3oAAAAAAAACtwAAAAEAAAAUc3RjbwAAAAAAAAABAAAAMAAAAGJ1ZHRhAAAAWm1ldGEAAAAAAAAAIWhkbHIAAAAAAAAAAG1kaXJhcHBsAAAAAAAAAAAAAAAALWlsc3QAAAAlqXRvbwAAAB1kYXRhAAAAAQAAAABMYXZmNTQuNjMuMTA0">
         </source> 
     </video>
+
+    <div id="confirmation-modal" class="modal-overlay">
+        <div class="modal-content">
+            <p id="modal-message" class="modal-message">Are you sure?</p>
+            <div class="modal-buttons">
+                <button id="modal-btn-cancel" class="modal-btn modal-btn-cancel">Cancel</button>
+                <button id="modal-btn-confirm" class="modal-btn modal-btn-confirm">Yes</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+    document.addEventListener('DOMContentLoaded', () => {
         // DOM Elements
         const editMode = document.getElementById('edit-mode');
         const scrollMode = document.getElementById('scroll-mode');
@@ -576,6 +724,10 @@ Check the little foofter for the code on Github.
         const mirrorToggle = document.getElementById('mirror-toggle');
         const sidewaysToggle = document.getElementById('sideways-toggle');
         
+        // Buttons
+        const clearTextBtn = document.getElementById('clear-text-btn');
+        const restoreTextBtn = document.getElementById('restore-text-btn');
+
         const startButton = document.getElementById('start-button');
         const pauseButton = document.getElementById('pause-button');
         const replayButton = document.getElementById('replay-button');
@@ -591,18 +743,36 @@ Check the little foofter for the code on Github.
         const currentScrollSpeed = document.getElementById('current-scroll-speed');
         
         const currentYearSpan = document.getElementById('current-year');
-
         const wakeLockIndicator = document.getElementById('wake-lock-indicator');
         const wakeLockVideo = document.getElementById('wake-lock-video');
-
         const footer = document.querySelector('footer');
         const body = document.body;
         
+        // Modal Elements
+        const modalOverlay = document.getElementById('confirmation-modal');
+        const modalMessage = document.getElementById('modal-message');
+        const modalConfirmBtn = document.getElementById('modal-btn-confirm');
+        const modalCancelBtn = document.getElementById('modal-btn-cancel');
+
+        // Default Constants
+        const DEFAULT_TEXT = `MakeItScroll – a quick and open source Teleprompter tool
+
+You can set the font size, scroll speed and toggle mirror mode to use on a real mirror teleprompter.
+When you're ready, click "MakeItScroll" to start the teleprompter.
+
+Check the little foofter for the code on Github.`;
+
+        const DEFAULT_FONT_SIZE = 36;
+        const DEFAULT_SCROLL_SPEED = 0.4;
+        const DEFAULT_MIRRORED = false;
+        const DEFAULT_SIDEWAYS = false;
+
         // State variables
-        let fontSize = 36;
-        let scrollSpeed = 0.5; // Default to 0.5 for slower scrolling
-        let isMirrored = false;
-        let isSideways = false;
+        let fontSize = DEFAULT_FONT_SIZE;
+        let scrollSpeed = DEFAULT_SCROLL_SPEED;
+        let isMirrored = DEFAULT_MIRRORED;
+        let isSideways = DEFAULT_SIDEWAYS;
+        
         let isScrolling = false;
         let isPaused = false;
         let animationFrameId = null;
@@ -613,77 +783,173 @@ Check the little foofter for the code on Github.
         let lastTimestamp = 0;
         let currentScrollPosition = 0;
         let fadeTimeout = null;
-
         let wakeLockFadeTimeout = null;
         let wakeLock = null;
         
         // Initialize
         function init() {
-            // Set current year in footer
             currentYearSpan.textContent = new Date().getFullYear();
             
-            // Update values from sliders
+            // Load settings from local storage
+            loadSettings();
+
+            // Force update UI from loaded values
+            fontSizeSlider.value = fontSize;
+            scrollSpeedSlider.value = scrollSpeed;
+            mirrorToggle.checked = isMirrored;
+            sidewaysToggle.checked = isSideways;
+
             updateFontSize();
             updateScrollSpeed();
-            
-            // Set up event listeners
+            updateMirrorMode();
+            updateSidewaysMode();
+
             setupEventListeners();
-            
-            // Initialize auto-resize for textarea
             initAutoResize();
         }
+
+        // NEW: Custom Modal Function
+        function showConfirmation(message, onConfirm) {
+            // Set message
+            modalMessage.textContent = message;
+            
+            // Show modal
+            modalOverlay.classList.add('active');
+
+            // Define cleanup function to remove listeners
+            const closeModal = () => {
+                modalOverlay.classList.remove('active');
+                modalConfirmBtn.onclick = null;
+                modalCancelBtn.onclick = null;
+            };
+
+            // Set button actions
+            modalConfirmBtn.onclick = () => {
+                onConfirm();
+                closeModal();
+            };
+
+            modalCancelBtn.onclick = () => {
+                closeModal();
+            };
+
+            // Close on background click
+            modalOverlay.onclick = (e) => {
+                if (e.target === modalOverlay) {
+                    closeModal();
+                }
+            };
+        }
         
-        // Auto-resize textarea function
+        // Save/Load Settings
+        function saveSettings() {
+            const settings = {
+                fontSize: fontSize,
+                scrollSpeed: scrollSpeed,
+                isMirrored: isMirrored,
+                isSideways: isSideways,
+                text: textInput.value
+            };
+            localStorage.setItem('makeItScrollSettings', JSON.stringify(settings));
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('makeItScrollSettings');
+            if (saved) {
+                try {
+                    const settings = JSON.parse(saved);
+                    if (settings.fontSize) fontSize = parseInt(settings.fontSize);
+                    if (settings.scrollSpeed) scrollSpeed = parseFloat(settings.scrollSpeed);
+                    if (settings.hasOwnProperty('isMirrored')) isMirrored = settings.isMirrored;
+                    if (settings.hasOwnProperty('isSideways')) isSideways = settings.isSideways;
+                    
+                    if (settings.text !== undefined) {
+                        textInput.value = settings.text;
+                    }
+                } catch (e) {
+                    console.error("Error loading settings", e);
+                }
+            } else {
+                if (!textInput.value.trim()) {
+                    textInput.value = DEFAULT_TEXT;
+                }
+            }
+        }
+
         function initAutoResize() {
-            // Initial resize
             adjustTextareaHeight();
-            
-            // Add event listeners for content changes
-            textInput.addEventListener('input', adjustTextareaHeight);
-            textInput.addEventListener('paste', function() {
-                // Use setTimeout to ensure content is pasted before adjusting
-                setTimeout(adjustTextareaHeight, 0);
+            textInput.addEventListener('input', () => {
+                adjustTextareaHeight();
+                saveSettings();
             });
-            
-            // Also adjust when window is resized (for responsive layouts)
+            textInput.addEventListener('paste', function() {
+                setTimeout(() => {
+                    adjustTextareaHeight();
+                    saveSettings();
+                }, 0);
+            });
             window.addEventListener('resize', adjustTextareaHeight);
         }
         
         function adjustTextareaHeight() {
-            // Reset height to auto to get the correct scrollHeight
             textInput.style.height = 'auto';
-            
-            // Set the height to scrollHeight + some padding
             textInput.style.height = (textInput.scrollHeight) + 'px';
         }
         
-        // Show values display with fade effect
         function showValuesDisplay() {
-            // Clear any existing timeout
-            if (fadeTimeout) {
-                clearTimeout(fadeTimeout);
-            }
-            
-            // Make the display visible
+            if (fadeTimeout) clearTimeout(fadeTimeout);
             valuesDisplay.classList.add('visible');
-            
-            // Set a timeout to fade it out after 3 seconds
             fadeTimeout = setTimeout(() => {
                 valuesDisplay.classList.remove('visible');
             }, 3000);
         }
         
-        // Event listeners
         function setupEventListeners() {
             // Edit mode controls
-            fontSizeSlider.addEventListener('input', updateFontSize);
-            scrollSpeedSlider.addEventListener('input', updateScrollSpeed);
-            mirrorToggle.addEventListener('change', updateMirrorMode);
-            sidewaysToggle.addEventListener('change', updateSidewaysMode);
+            fontSizeSlider.addEventListener('input', () => { updateFontSize(); saveSettings(); });
+            scrollSpeedSlider.addEventListener('input', () => { updateScrollSpeed(); saveSettings(); });
+            mirrorToggle.addEventListener('change', () => { updateMirrorMode(); saveSettings(); });
+            sidewaysToggle.addEventListener('change', () => { updateSidewaysMode(); saveSettings(); });
+            
+            // --- UPDATED: Modal Logic for Buttons ---
+
+            // Clear Text
+            clearTextBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                showConfirmation('Are you sure you want to clear the text?', () => {
+                    textInput.value = '';
+                    adjustTextareaHeight();
+                    saveSettings();
+                });
+            });
+
+            // Restore All Defaults
+            restoreTextBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                showConfirmation('Restore default settings and text?', () => {
+                    // 1. Reset Text
+                    textInput.value = DEFAULT_TEXT;
+                    adjustTextareaHeight();
+
+                    // 2. Reset UI Controls to Default
+                    fontSizeSlider.value = DEFAULT_FONT_SIZE;
+                    scrollSpeedSlider.value = DEFAULT_SCROLL_SPEED;
+                    mirrorToggle.checked = DEFAULT_MIRRORED;
+                    sidewaysToggle.checked = DEFAULT_SIDEWAYS;
+
+                    // 3. Trigger Updates to sync Variables and View
+                    updateFontSize();     
+                    updateScrollSpeed();  
+                    updateMirrorMode();   
+                    updateSidewaysMode(); 
+
+                    // 4. Save
+                    saveSettings();
+                });
+            });
+            
             startButton.addEventListener('click', startScrolling);
 
-            
-            
             // Scroll mode controls
             pauseButton.addEventListener('click', togglePause);
             replayButton.addEventListener('click', replayText);
@@ -692,145 +958,114 @@ Check the little foofter for the code on Github.
             fontIncreaseButton.addEventListener('click', () => {
                 fontSize = Math.min(fontSize + 2, 96);
                 scrollText.style.fontSize = `${fontSize}px`;
-                // Update the slider in edit mode to maintain consistency
                 fontSizeSlider.value = fontSize;
                 fontSizeValue.textContent = fontSize;
-                // Update the floating display
                 currentFontSize.textContent = fontSize;
-                // Show the values display
                 showValuesDisplay();
+                saveSettings();
             });
-            
             fontDecreaseButton.addEventListener('click', () => {
                 fontSize = Math.max(fontSize - 2, 24);
                 scrollText.style.fontSize = `${fontSize}px`;
-                // Update the slider in edit mode to maintain consistency
                 fontSizeSlider.value = fontSize;
                 fontSizeValue.textContent = fontSize;
-                // Update the floating display
                 currentFontSize.textContent = fontSize;
-                // Show the values display
                 showValuesDisplay();
+                saveSettings();
             });
-            
             speedIncreaseButton.addEventListener('click', () => {
-                // Use 0.05 increments for the buttons
                 scrollSpeed = Math.min(scrollSpeed + 0.05, 2);
-                scrollSpeed = parseFloat(scrollSpeed.toFixed(2)); // Round to 2 decimal places
-                // Update the slider in edit mode to maintain consistency
+                scrollSpeed = parseFloat(scrollSpeed.toFixed(2));
                 scrollSpeedSlider.value = scrollSpeed;
                 scrollSpeedValue.textContent = scrollSpeed.toFixed(2);
-                // Update the floating display
                 currentScrollSpeed.textContent = scrollSpeed.toFixed(2);
-                // Show the values display
                 showValuesDisplay();
-                console.log("Speed increased to:", scrollSpeed);
+                saveSettings();
             });
-            
             speedDecreaseButton.addEventListener('click', () => {
-                // Use 0.05 decrements for the buttons
                 scrollSpeed = Math.max(scrollSpeed - 0.05, 0.01);
-                scrollSpeed = parseFloat(scrollSpeed.toFixed(2)); // Round to 2 decimal places
-                // Update the slider in edit mode to maintain consistency
+                scrollSpeed = parseFloat(scrollSpeed.toFixed(2));
                 scrollSpeedSlider.value = scrollSpeed;
                 scrollSpeedValue.textContent = scrollSpeed.toFixed(2);
-                // Update the floating display
                 currentScrollSpeed.textContent = scrollSpeed.toFixed(2);
-                // Show the values display
                 showValuesDisplay();
-                console.log("Speed decreased to:", scrollSpeed);
+                saveSettings();
             });
-            
+
             // Mouse wheel scrolling
             scrollTextContainer.addEventListener('wheel', (e) => {
                 e.preventDefault();
-                
-                // If auto-scrolling, stop it when user manually scrolls
                 if (isScrolling && !isPaused) {
                     pauseScrolling();
                 }
-                
                 scrollTextContainer.scrollTop += e.deltaY;
                 currentScrollPosition = scrollTextContainer.scrollTop;
             });
-            
+
             // Mouse drag scrolling
             scrollTextContainer.addEventListener('mousedown', (e) => {
-                // If auto-scrolling, stop it when user manually scrolls
                 if (isScrolling && !isPaused) {
                     pauseScrolling();
                 }
-                
                 isDragging = true;
                 lastClientY = e.clientY;
                 lastClientX = e.clientX;
                 lastScrollPosition = scrollTextContainer.scrollTop;
                 scrollTextContainer.style.cursor = 'grabbing';
             });
-            
+
             document.addEventListener('mousemove', (e) => {
                 if (isDragging) {
                     if (isSideways) {
-                        // In sideways mode, use horizontal movement (X) for scrolling
                         const deltaX = e.clientX - lastClientX;
-                        // Use positive deltaX for more natural feel in sideways mode
                         scrollTextContainer.scrollTop = lastScrollPosition + deltaX;
                     } else {
-                        // Normal mode - use vertical movement (Y)
                         const deltaY = lastClientY - e.clientY;
                         scrollTextContainer.scrollTop = lastScrollPosition + deltaY;
                     }
                     currentScrollPosition = scrollTextContainer.scrollTop;
                 }
             });
-            
+
             document.addEventListener('mouseup', () => {
                 isDragging = false;
                 scrollTextContainer.style.cursor = 'grab';
             });
-            
-            // Touch events for mobile
+
+            // Touch events
             scrollTextContainer.addEventListener('touchstart', (e) => {
-                // If auto-scrolling, stop it when user manually scrolls
                 if (isScrolling && !isPaused) {
                     pauseScrolling();
                 }
-                
                 isDragging = true;
                 lastClientY = e.touches[0].clientY;
                 lastClientX = e.touches[0].clientX;
                 lastScrollPosition = scrollTextContainer.scrollTop;
             });
-            
+
             scrollTextContainer.addEventListener('touchmove', (e) => {
                 if (isDragging) {
                     if (isSideways) {
-                        // In sideways mode, use horizontal movement (X) for scrolling
                         const deltaX = e.touches[0].clientX - lastClientX;
-                        // Use positive deltaX for more natural feel in sideways mode
                         scrollTextContainer.scrollTop = lastScrollPosition + deltaX;
                     } else {
-                        // Normal mode - use vertical movement (Y)
                         const deltaY = lastClientY - e.touches[0].clientY;
                         scrollTextContainer.scrollTop = lastScrollPosition + deltaY;
                     }
                     currentScrollPosition = scrollTextContainer.scrollTop;
-                    e.preventDefault(); // Prevent page scrolling
+                    e.preventDefault();
                 }
             });
-            
+
             scrollTextContainer.addEventListener('touchend', () => {
                 isDragging = false;
             });
         }
         
-        // Update functions
         function updateFontSize() {
             fontSize = parseInt(fontSizeSlider.value);
             fontSizeValue.textContent = fontSize;
-            // Update the floating display if in scroll mode
             currentFontSize.textContent = fontSize;
-            // Show the values display if in scroll mode
             if (scrollMode.style.display === 'block') {
                 showValuesDisplay();
             }
@@ -838,10 +1073,8 @@ Check the little foofter for the code on Github.
         
         function updateScrollSpeed() {
             scrollSpeed = parseFloat(scrollSpeedSlider.value);
-            scrollSpeedValue.textContent = scrollSpeed.toFixed(2); // Display with 2 decimal places
-            // Update the floating display if in scroll mode
+            scrollSpeedValue.textContent = scrollSpeed.toFixed(2);
             currentScrollSpeed.textContent = scrollSpeed.toFixed(2);
-            // Show the values display if in scroll mode
             if (scrollMode.style.display === 'block') {
                 showValuesDisplay();
             }
@@ -856,116 +1089,78 @@ Check the little foofter for the code on Github.
             body.classList.toggle('sideways', isSideways);
         }
         
-        // Smooth scrolling animation using requestAnimationFrame
         function animateScroll(timestamp) {
             if (!lastTimestamp) lastTimestamp = timestamp;
-            
-            // Calculate time elapsed since last frame
             const elapsed = timestamp - lastTimestamp;
+            const scrollAmount = (scrollSpeed * elapsed) / 10;
             
-            // Calculate how much to scroll based on time and speed
-            // Multiply by a factor to make even slow speeds visible
-            const scrollAmount = (scrollSpeed * elapsed) / 10; // Adjusted for slower speeds
-            
-            // Update scroll position
             currentScrollPosition += scrollAmount;
             scrollTextContainer.scrollTop = currentScrollPosition;
             
-            // Save timestamp for next frame
             lastTimestamp = timestamp;
-            
-            // Continue animation if not paused
             if (isScrolling && !isPaused) {
                 animationFrameId = requestAnimationFrame(animateScroll);
             }
         }
         
-        // Mode switching
         function startScrolling() {
-            // Copy text from input to scroll view
             scrollText.textContent = textInput.value;
-            
-            // Apply styles
             scrollText.style.fontSize = `${fontSize}px`;
             scrollText.classList.toggle('mirrored', isMirrored);
-            
-            // Apply sideways mode if enabled
             body.classList.toggle('sideways', isSideways);
             
-            // Switch modes
             editMode.style.display = 'none';
             scrollMode.style.display = 'block';
             
-            // Show the values display initially
             currentFontSize.textContent = fontSize;
             currentScrollSpeed.textContent = scrollSpeed.toFixed(2);
             showValuesDisplay();
             
-            // Reset scroll position
             scrollTextContainer.scrollTop = 0;
             currentScrollPosition = 0;
             
-            // Start scrolling
             isScrolling = true;
             isPaused = false;
             lastTimestamp = 0;
 
-            // Enable wake lock to prevent screen from turning off
             enableWakeLock();
-
-            // Hide footer in scroll mode
             footer.style.display = 'none';
-            
-            // Start animation
             animationFrameId = requestAnimationFrame(animateScroll);
             
-            // Update pause button text
             pauseButton.innerHTML = '⏸️';
+            pauseButton.classList.remove('paused');
+            pauseButton.classList.add('playing');
         }
         
         function returnToEditMode() {
-            // Stop scrolling
             if (animationFrameId) {
                 cancelAnimationFrame(animationFrameId);
                 animationFrameId = null;
             }
             isScrolling = false;
-
-            // Release wake lock
             releaseWakeLock();
-            
-            // Clear any fade timeout
             if (fadeTimeout) {
                 clearTimeout(fadeTimeout);
                 fadeTimeout = null;
             }
             
-            // Switch modes
             scrollMode.style.display = 'none';
             editMode.style.display = 'block';
             
-            // Re-adjust textarea height in case content changed
             setTimeout(adjustTextareaHeight, 0);
-            // Show footer again
             footer.style.display = 'block';
         }
         
-        // Replay function - reset to top without auto-scrolling
         function replayText() {
-            // Pause scrolling if it's active
             if (isScrolling && !isPaused) {
                 pauseScrolling();
             }
-            
-            // Reset scroll position
             scrollTextContainer.scrollTop = 0;
             currentScrollPosition = 0;
         }
         
-        // Scrolling controls
         function togglePause() {
             isPaused = !isPaused;
-            
             if (isPaused) {
                 pauseScrolling();
             } else {
@@ -980,52 +1175,40 @@ Check the little foofter for the code on Github.
                 animationFrameId = null;
             }
             pauseButton.innerHTML = '▶️';
+            pauseButton.classList.remove('playing');
+            pauseButton.classList.add('paused');
         }
         
         function resumeScrolling() {
             isPaused = false;
-            lastTimestamp = 0; // Reset timestamp to avoid jumps
-            currentScrollPosition = scrollTextContainer.scrollTop; // Start from current position
+            lastTimestamp = 0;
+            currentScrollPosition = scrollTextContainer.scrollTop;
             animationFrameId = requestAnimationFrame(animateScroll);
             pauseButton.innerHTML = '⏸️';
+            pauseButton.classList.remove('paused');
+            pauseButton.classList.add('playing');
         }
-        
-        // Show wake lock indicator with fade effect
+
+        // Wake Lock Logic
         function showWakeLockIndicator() {
-            // Clear any existing timeout
-            if (wakeLockFadeTimeout) {
-                clearTimeout(wakeLockFadeTimeout);
-            }
-            
-            // Make the indicator visible
+            if (wakeLockFadeTimeout) clearTimeout(wakeLockFadeTimeout);
             wakeLockIndicator.classList.add('visible');
-            
-            // Set a timeout to fade it out after 5 seconds
             wakeLockFadeTimeout = setTimeout(() => {
                 wakeLockIndicator.classList.remove('visible');
             }, 5000);
         }
 
-        // Wake Lock API functions
         async function requestWakeLock() {
-            // Check if the Wake Lock API is supported
             if ('wakeLock' in navigator) {
                 try {
-                    // Request a screen wake lock
                     wakeLock = await navigator.wakeLock.request('screen');
-                    
-                    // Show indicator
                     showWakeLockIndicator();
-                    
-                    // Listen for wake lock release
                     wakeLock.addEventListener('release', () => {
                         console.log('Wake Lock was released');
-                        // Try to reacquire the wake lock if we're still in scroll mode
                         if (scrollMode.style.display === 'block') {
                             requestWakeLock();
                         }
                     });
-                    
                     console.log('Wake Lock is active');
                     return true;
                 } catch (err) {
@@ -1036,10 +1219,8 @@ Check the little foofter for the code on Github.
             return false;
         }
 
-        // Fallback method for browsers that don't support Wake Lock API
         function enableFallbackWakeLock() {
             try {
-                // Play the silent video to keep the screen awake
                 wakeLockVideo.play().then(() => {
                     console.log('Fallback wake lock enabled');
                     showWakeLockIndicator();
@@ -1053,20 +1234,14 @@ Check the little foofter for the code on Github.
             }
         }
 
-        // Enable screen wake lock using available methods
         async function enableWakeLock() {
-            // Try the Wake Lock API first
             const apiSuccess = await requestWakeLock();
-            
-            // If Wake Lock API failed or isn't supported, try the fallback
             if (!apiSuccess) {
                 enableFallbackWakeLock();
             }
         }
 
-        // Release wake lock
         function releaseWakeLock() {
-            // Release Wake Lock API if active
             if (wakeLock) {
                 wakeLock.release()
                     .then(() => {
@@ -1077,21 +1252,17 @@ Check the little foofter for the code on Github.
                         console.error(`Error releasing wake lock: ${err.message}`);
                     });
             }
-            
-            // Stop the fallback video
             wakeLockVideo.pause();
-            
-            // Hide the indicator
             wakeLockIndicator.classList.remove('visible');
-            
-            // Clear any fade timeout
             if (wakeLockFadeTimeout) {
                 clearTimeout(wakeLockFadeTimeout);
                 wakeLockFadeTimeout = null;
             }
         }
-        // Initialize the app
+
+        // Start initialization
         init();
+    });
     </script>
 </body>
 </html>

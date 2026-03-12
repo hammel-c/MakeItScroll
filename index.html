@@ -131,6 +131,35 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
             padding: 1.5rem;
         }
+
+        /* Collapsible Controls Header */
+        .controls-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 500;
+            color: #e0e0e0;
+            user-select: none;
+        }
+
+        .controls-header span.chevron {
+            transition: transform 0.3s ease;
+            display: inline-block;
+        }
+
+        .controls-header span.chevron.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        #controls-content {
+            margin-top: 1.5rem;
+            display: block;
+        }
+
+        #controls-content.collapsed {
+            display: none;
+        }
         
         .control-group {
             margin-bottom: 1rem;
@@ -223,6 +252,7 @@
         /* Text Action Buttons Container */
         .text-options {
             display: flex;
+            flex-wrap: wrap; /* Allows buttons to wrap on very small screens */
             gap: 15px;
             margin-top: 1.5rem;
             padding-top: 1rem;
@@ -245,6 +275,7 @@
             text-align: center;
             line-height: normal;
             display: inline-block;
+            min-width: 120px; /* Prevents buttons from getting too squished */
         }
 
         .secondary-button:hover {
@@ -613,35 +644,42 @@
         <div id="edit-mode">
             <button id="start-button" class="primary-action-btn">MakeItScroll</button>
             <div class="controls">
-                <div class="control-group">
-                    <label for="font-size">Font Size: <span id="font-size-value" class="control-value">36</span>px</label>
-                    <input type="range" id="font-size" min="24" max="96" value="36" step="1">
+                <div class="controls-header" id="controls-toggle">
+                    <span>Teleprompter Controls</span>
+                    <span class="chevron" id="controls-chevron">▼</span>
                 </div>
                 
-                <div class="control-group">
-                    <label for="scroll-speed">Scroll Speed: <span id="scroll-speed-value" class="control-value">0.40</span></label>
-                    <input type="range" id="scroll-speed" min="0.01" max="2" value="0.40" step="0.01">
-                </div>
-                
-                <div class="toggles-container">
-                    <div class="switch-container">
-                        <label class="switch">
-                            <input type="checkbox" id="mirror-toggle">
-                            <span class="slider"></span>
-                        </label>
-                        <span>Mirror Text</span>
+                <div id="controls-content">
+                    <div class="control-group">
+                        <label for="font-size">Font Size: <span id="font-size-value" class="control-value">36</span>px</label>
+                        <input type="range" id="font-size" min="24" max="96" value="36" step="1">
                     </div>
                     
-                    <div class="switch-container">
-                        <label class="switch">
-                            <input type="checkbox" id="sideways-toggle">
-                            <span class="slider"></span>
-                        </label>
-                        <span>Force Sideways</span>
+                    <div class="control-group">
+                        <label for="scroll-speed">Scroll Speed: <span id="scroll-speed-value" class="control-value">0.40</span></label>
+                        <input type="range" id="scroll-speed" min="0.01" max="2" value="0.40" step="0.01">
+                    </div>
+                    
+                    <div class="toggles-container">
+                        <div class="switch-container">
+                            <label class="switch">
+                                <input type="checkbox" id="mirror-toggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span>Mirror Text</span>
+                        </div>
+                        
+                        <div class="switch-container">
+                            <label class="switch">
+                                <input type="checkbox" id="sideways-toggle">
+                                <span class="slider"></span>
+                            </label>
+                            <span>Force Sideways</span>
+                        </div>
                     </div>
                 </div>
-
                 <div class="text-options">
+                    <button type="button" id="paste-text-btn" class="secondary-button">Paste Clipboard</button>
                     <button type="button" id="clear-text-btn" class="secondary-button">Clear Text</button>
                     <button type="button" id="restore-text-btn" class="secondary-button">Restore Default</button>
                 </div>
@@ -691,7 +729,7 @@ Check the little footer for the code on Github.</textarea>
 
     <footer>
         <p>MakeItScroll &copy;
-        <span id="current-year"></span> <a href="https://github.com/hammel-c/MakeItScroll"> by hammel-c</a> ver.1.0.6</p> 
+        <span id="current-year"></span> <a href="https://github.com/hammel-c/MakeItScroll"> by hammel-c</a> ver.1.0.7</p> 
     </footer>
     <video width="10" height="10" id="wake-lock-video" playsinline loop muted>
         <source src="data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAAr9tZGF0AAACoAYF//+c3EXpvebZSLeWLNgg2SPu73gyNjQgLSBjb3JlIDEyNSAtIEguMjY0L01QRUctNCBBVkMgY29kZWMgLSBDb3B5bGVmdCAyMDAzLTIwMTIgLSBodHRwOi8vd3d3LnZpZGVvbGFuLm9yZy94MjY0Lmh0bWwgLSBvcHRpb25zOiBjYWJhYz0xIHJlZj0zIGRlYmxvY2s9MTowOjAgYW5hbHlzZT0weDM6MHgxMTMgbWU9aGV4IHN1Ym1lPTcgcHN5PTEgcHN5X3JkPTEuMDA6MC4wMCBtaXhlZF9yZWY9MSBtZV9yYW5nZT0xNiBjaHJvbWFfbWU9MSB0cmVsbGlzPTEgOHg4ZGN0PTEgY3FtPTAgZGVhZHpvbmU9MjEsMTEgZmFzdF9wc2tpcD0xIGNocm9tYV9xcF9vZmZzZXQ9LTIgdGhyZWFkcz02IGxvb2thaGVhZF90aHJlYWRzPTEgc2xpY2VkX3RocmVhZHM9MCBucj0wIGRlY2ltYXRlPTEgaW50ZXJsYWNlZD0wIGJsdXJheV9jb21wYXQ9MCBjb25zdHJhaW5lZF9pbnRyYT0wIGJmcmFtZXM9MyBiX3B5cmFtaWQ9MiBiX2FkYXB0PTEgYl9iaWFzPTAgZGlyZWN0PTEgd2VpZ2h0Yj0xIG9wZW5fZ29wPTAgd2VpZ2h0cD0yIGtleWludD0yNTAga2V5aW50X21pbj0yNCBzY2VuZWN1dD00MCBpbnRyYV9yZWZyZXNoPTAgcmNfbG9va2FoZWFkPTQwIHJjPWNyZiBtYnRyZWU9MSBjcmY9MjMuMCBxY29tcD0wLjYwIHFwbWluPTAgcXBtYXg9NjkgcXBzdGVwPTQgaXBfcmF0aW89MS40MCBhcT0xOjEuMDAAgAAAAA9liIQAV/0TAAYdeBTXzg8AAALvbW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAACoAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAhl0cmFrAAAAXHRraGQAAAAPAAAAAAAAAAAAAAABAAAAAAAAACoAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAgAAAAIAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAAqAAAAAAABAAAAAAGRbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAwAAAAAgBVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABPG1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAPxzdGJsAAAAmHN0c2QAAAAAAAAAAQAAAIhhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAgACABIAAAASAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGP//AAAAMmF2Y0MBZAAK/+EAGWdkAAqs2V+WXAWyAAADAAIAAAMAYB4kSywBAAZo6+PLIsAAAAAYc3R0cwAAAAAAAAABAAAAAQAAAgAAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAEAAAABAAAAFHN0c3oAAAAAAAACtwAAAAEAAAAUc3RjbwAAAAAAAAABAAAAMAAAAGJ1ZHRhAAAAWm1ldGEAAAAAAAAAIWhkbHIAAAAAAAAAAG1kaXJhcHBsAAAAAAAAAAAAAAAALWlsc3QAAAAlqXRvbwAAAB1kYXRhAAAAAQAAAABMYXZmNTQuNjMuMTA0">
@@ -717,6 +755,10 @@ Check the little footer for the code on Github.</textarea>
         const scrollText = document.getElementById('scroll-text');
         const scrollTextContainer = document.getElementById('scroll-text-container');
         
+        const controlsToggle = document.getElementById('controls-toggle');
+        const controlsContent = document.getElementById('controls-content');
+        const controlsChevron = document.getElementById('controls-chevron');
+
         const fontSizeSlider = document.getElementById('font-size');
         const fontSizeValue = document.getElementById('font-size-value');
         const scrollSpeedSlider = document.getElementById('scroll-speed');
@@ -725,6 +767,7 @@ Check the little footer for the code on Github.</textarea>
         const sidewaysToggle = document.getElementById('sideways-toggle');
         
         // Buttons
+        const pasteTextBtn = document.getElementById('paste-text-btn');
         const clearTextBtn = document.getElementById('clear-text-btn');
         const restoreTextBtn = document.getElementById('restore-text-btn');
 
@@ -766,12 +809,14 @@ Check the little footer for the code on Github.`;
         const DEFAULT_SCROLL_SPEED = 0.4;
         const DEFAULT_MIRRORED = false;
         const DEFAULT_SIDEWAYS = false;
+        const DEFAULT_CONTROLS_COLLAPSED = false;
 
         // State variables
         let fontSize = DEFAULT_FONT_SIZE;
         let scrollSpeed = DEFAULT_SCROLL_SPEED;
         let isMirrored = DEFAULT_MIRRORED;
         let isSideways = DEFAULT_SIDEWAYS;
+        let isControlsCollapsed = DEFAULT_CONTROLS_COLLAPSED;
         
         let isScrolling = false;
         let isPaused = false;
@@ -803,6 +848,7 @@ Check the little footer for the code on Github.`;
             updateScrollSpeed();
             updateMirrorMode();
             updateSidewaysMode();
+            updateControlsState();
 
             setupEventListeners();
             initAutoResize();
@@ -848,6 +894,7 @@ Check the little footer for the code on Github.`;
                 scrollSpeed: scrollSpeed,
                 isMirrored: isMirrored,
                 isSideways: isSideways,
+                isControlsCollapsed: isControlsCollapsed,
                 text: textInput.value
             };
             localStorage.setItem('makeItScrollSettings', JSON.stringify(settings));
@@ -862,6 +909,7 @@ Check the little footer for the code on Github.`;
                     if (settings.scrollSpeed) scrollSpeed = parseFloat(settings.scrollSpeed);
                     if (settings.hasOwnProperty('isMirrored')) isMirrored = settings.isMirrored;
                     if (settings.hasOwnProperty('isSideways')) isSideways = settings.isSideways;
+                    if (settings.hasOwnProperty('isControlsCollapsed')) isControlsCollapsed = settings.isControlsCollapsed;
                     
                     if (settings.text !== undefined) {
                         textInput.value = settings.text;
@@ -903,15 +951,47 @@ Check the little footer for the code on Github.`;
                 valuesDisplay.classList.remove('visible');
             }, 3000);
         }
+
+        function updateControlsState() {
+            if (isControlsCollapsed) {
+                controlsContent.classList.add('collapsed');
+                controlsChevron.classList.add('collapsed');
+            } else {
+                controlsContent.classList.remove('collapsed');
+                controlsChevron.classList.remove('collapsed');
+            }
+        }
         
         function setupEventListeners() {
             // Edit mode controls
+            controlsToggle.addEventListener('click', () => {
+                isControlsCollapsed = !isControlsCollapsed;
+                updateControlsState();
+                saveSettings();
+            });
+
             fontSizeSlider.addEventListener('input', () => { updateFontSize(); saveSettings(); });
             scrollSpeedSlider.addEventListener('input', () => { updateScrollSpeed(); saveSettings(); });
             mirrorToggle.addEventListener('change', () => { updateMirrorMode(); saveSettings(); });
             sidewaysToggle.addEventListener('change', () => { updateSidewaysMode(); saveSettings(); });
             
             // --- UPDATED: Modal Logic for Buttons ---
+
+            // Paste Text
+            pasteTextBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    const text = await navigator.clipboard.readText();
+                    if (text) {
+                        textInput.value = text;
+                        adjustTextareaHeight();
+                        saveSettings();
+                    }
+                } catch (err) {
+                    console.error('Failed to read clipboard contents: ', err);
+                    alert('Could not paste text. Please check your browser clipboard permissions.');
+                }
+            });
 
             // Clear Text
             clearTextBtn.addEventListener('click', (e) => {
@@ -936,12 +1016,14 @@ Check the little footer for the code on Github.`;
                     scrollSpeedSlider.value = DEFAULT_SCROLL_SPEED;
                     mirrorToggle.checked = DEFAULT_MIRRORED;
                     sidewaysToggle.checked = DEFAULT_SIDEWAYS;
+                    isControlsCollapsed = DEFAULT_CONTROLS_COLLAPSED;
 
                     // 3. Trigger Updates to sync Variables and View
                     updateFontSize();     
                     updateScrollSpeed();  
                     updateMirrorMode();   
                     updateSidewaysMode(); 
+                    updateControlsState();
 
                     // 4. Save
                     saveSettings();

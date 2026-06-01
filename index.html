@@ -330,7 +330,6 @@
             overflow-y: auto;
             padding: 2rem;
             padding-top: 30vh;
-            padding-left: 80px; /* Add padding to prevent overlap with controls */
             cursor: grab;
             /* Improve scrolling performance */
             will-change: transform, scroll-position;
@@ -348,11 +347,15 @@
             /* Firefox */
         }
         
+        /* Dynamic padding classes for scroll-text-container */
+        .scroll-text-container.pad-left { padding-left: 80px; }
+        .scroll-text-container.pad-right { padding-right: 80px; }
+        .scroll-text-container.pad-top { padding-top: calc(30vh + 80px); }
+        .scroll-text-container.pad-bottom { padding-bottom: 80px; }
+
         /* Adjust scroll text container in sideways mode */
         body.sideways .scroll-text-container {
-            padding-left: 80px;
             /* Increase padding-right to 60px to clear Android nav buttons */
-            padding-right: 60px;
             /* Also add safe area padding just in case */
             padding-right: calc(60px + env(safe-area-inset-bottom));
         }
@@ -384,24 +387,41 @@
         
         .side-controls {
             position: fixed;
-            left: 20px; /* Changed from right to left */
-            top: 50%;
-            transform: translateY(-50%);
             display: flex;
-            flex-direction: column;
             gap: 10px;
             background-color: rgba(0, 0, 0, 0.8);
             padding: 15px;
             border-radius: 15px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
             z-index: 100;
+            transition: all 0.3s ease;
             /* Ensure controls are above text */
         }
-        
-        /* Adjust side controls in sideways mode */
-        body.sideways .side-controls {
+
+        /* Dynamic position classes for side-controls */
+        .side-controls.pos-left {
             left: 20px;
             top: 50%;
+            transform: translateY(-50%);
+            flex-direction: column;
+        }
+        .side-controls.pos-right {
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            flex-direction: column;
+        }
+        .side-controls.pos-top {
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            flex-direction: row;
+        }
+        .side-controls.pos-bottom {
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            flex-direction: row;
         }
         
         .control-button {
@@ -430,6 +450,13 @@
             height: 1px;
             background-color: rgba(255, 255, 255, 0.2);
             margin: 5px 0;
+        }
+
+        .side-controls.pos-top .control-divider,
+        .side-controls.pos-bottom .control-divider {
+            width: 1px;
+            height: 30px;
+            margin: 5px 5px;
         }
         
         /* Floating values display with fade effect */
@@ -468,20 +495,23 @@
             }
             
             .side-controls {
-                left: 10px;
-                /* Changed from right to left */
                 padding: 10px;
             }
+
+            .side-controls.pos-left { left: 10px; }
+            .side-controls.pos-right { right: 10px; }
+            .side-controls.pos-top { top: 10px; }
+            .side-controls.pos-bottom { bottom: 10px; }
             
             .control-button {
                 width: 36px;
                 height: 36px;
             }
             
-            .scroll-text-container {
-                padding-left: 60px;
-                /* Smaller padding on mobile */
-            }
+            .scroll-text-container.pad-left { padding-left: 60px; }
+            .scroll-text-container.pad-right { padding-right: 60px; }
+            .scroll-text-container.pad-top { padding-top: calc(30vh + 60px); }
+            .scroll-text-container.pad-bottom { padding-bottom: 60px; }
             
             .values-display {
                 right: 10px;
@@ -659,6 +689,16 @@
                         <label for="scroll-speed">Scroll Speed: <span id="scroll-speed-value" class="control-value">0.40</span></label>
                         <input type="range" id="scroll-speed" min="0.01" max="2" value="0.40" step="0.01">
                     </div>
+
+                    <div class="control-group">
+                        <label for="controls-position">Controls Position</label>
+                        <select id="controls-position" style="width: 100%; padding: 0.5rem; background-color: #444; color: #e0e0e0; border: 1px solid #555; border-radius: 4px; font-family: inherit;">
+                            <option value="left">Left</option>
+                            <option value="right">Right</option>
+                            <option value="top">Top</option>
+                            <option value="bottom">Bottom</option>
+                        </select>
+                    </div>
                     
                     <div class="toggles-container">
                         <div class="switch-container">
@@ -729,7 +769,7 @@ Check the little footer for the code on Github.</textarea>
 
     <footer>
         <p>MakeItScroll &copy;
-        <span id="current-year"></span> <a href="https://github.com/hammel-c/MakeItScroll"> by hammel-c</a> ver.1.0.7</p> 
+        <span id="current-year"></span> <a href="https://github.com/hammel-c/MakeItScroll"> by hammel-c</a> ver.1.0.8</p> 
     </footer>
     <video width="10" height="10" id="wake-lock-video" playsinline loop muted>
         <source src="data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAAr9tZGF0AAACoAYF//+c3EXpvebZSLeWLNgg2SPu73gyNjQgLSBjb3JlIDEyNSAtIEguMjY0L01QRUctNCBBVkMgY29kZWMgLSBDb3B5bGVmdCAyMDAzLTIwMTIgLSBodHRwOi8vd3d3LnZpZGVvbGFuLm9yZy94MjY0Lmh0bWwgLSBvcHRpb25zOiBjYWJhYz0xIHJlZj0zIGRlYmxvY2s9MTowOjAgYW5hbHlzZT0weDM6MHgxMTMgbWU9aGV4IHN1Ym1lPTcgcHN5PTEgcHN5X3JkPTEuMDA6MC4wMCBtaXhlZF9yZWY9MSBtZV9yYW5nZT0xNiBjaHJvbWFfbWU9MSB0cmVsbGlzPTEgOHg4ZGN0PTEgY3FtPTAgZGVhZHpvbmU9MjEsMTEgZmFzdF9wc2tpcD0xIGNocm9tYV9xcF9vZmZzZXQ9LTIgdGhyZWFkcz02IGxvb2thaGVhZF90aHJlYWRzPTEgc2xpY2VkX3RocmVhZHM9MCBucj0wIGRlY2ltYXRlPTEgaW50ZXJsYWNlZD0wIGJsdXJheV9jb21wYXQ9MCBjb25zdHJhaW5lZF9pbnRyYT0wIGJmcmFtZXM9MyBiX3B5cmFtaWQ9MiBiX2FkYXB0PTEgYl9iaWFzPTAgZGlyZWN0PTEgd2VpZ2h0Yj0xIG9wZW5fZ29wPTAgd2VpZ2h0cD0yIGtleWludD0yNTAga2V5aW50X21pbj0yNCBzY2VuZWN1dD00MCBpbnRyYV9yZWZyZXNoPTAgcmNfbG9va2FoZWFkPTQwIHJjPWNyZiBtYnRyZWU9MSBjcmY9MjMuMCBxY29tcD0wLjYwIHFwbWluPTAgcXBtYXg9NjkgcXBzdGVwPTQgaXBfcmF0aW89MS40MCBhcT0xOjEuMDAAgAAAAA9liIQAV/0TAAYdeBTXzg8AAALvbW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAACoAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAhl0cmFrAAAAXHRraGQAAAAPAAAAAAAAAAAAAAABAAAAAAAAACoAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAgAAAAIAAAAAAAkZWR0cwAAABxlbHN0AAAAAAAAAAEAAAAqAAAAAAABAAAAAAGRbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAwAAAAAgBVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABPG1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAACRkaW5mAAAAHGRyZWYAAAAAAAAAAQAAAAx1cmwgAAAAAQAAAPxzdGJsAAAAmHN0c2QAAAAAAAAAAQAAAIhhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAgACABIAAAASAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGP//AAAAMmF2Y0MBZAAK/+EAGWdkAAqs2V+WXAWyAAADAAIAAAMAYB4kSywBAAZo6+PLIsAAAAAYc3R0cwAAAAAAAAABAAAAAQAAAgAAAAAcc3RzYwAAAAAAAAABAAAAAQAAAAEAAAABAAAAFHN0c3oAAAAAAAACtwAAAAEAAAAUc3RjbwAAAAAAAAABAAAAMAAAAGJ1ZHRhAAAAWm1ldGEAAAAAAAAAIWhkbHIAAAAAAAAAAG1kaXJhcHBsAAAAAAAAAAAAAAAALWlsc3QAAAAlqXRvbwAAAB1kYXRhAAAAAQAAAABMYXZmNTQuNjMuMTA0">
@@ -763,9 +803,12 @@ Check the little footer for the code on Github.</textarea>
         const fontSizeValue = document.getElementById('font-size-value');
         const scrollSpeedSlider = document.getElementById('scroll-speed');
         const scrollSpeedValue = document.getElementById('scroll-speed-value');
+        const controlsPositionSelect = document.getElementById('controls-position');
         const mirrorToggle = document.getElementById('mirror-toggle');
         const sidewaysToggle = document.getElementById('sideways-toggle');
         
+        const sideControls = document.querySelector('.side-controls');
+
         // Buttons
         const pasteTextBtn = document.getElementById('paste-text-btn');
         const clearTextBtn = document.getElementById('clear-text-btn');
@@ -807,6 +850,7 @@ Check the little footer for the code on Github.`;
 
         const DEFAULT_FONT_SIZE = 36;
         const DEFAULT_SCROLL_SPEED = 0.4;
+        const DEFAULT_CONTROLS_POSITION = 'left';
         const DEFAULT_MIRRORED = false;
         const DEFAULT_SIDEWAYS = false;
         const DEFAULT_CONTROLS_COLLAPSED = false;
@@ -814,6 +858,7 @@ Check the little footer for the code on Github.`;
         // State variables
         let fontSize = DEFAULT_FONT_SIZE;
         let scrollSpeed = DEFAULT_SCROLL_SPEED;
+        let controlsPosition = DEFAULT_CONTROLS_POSITION;
         let isMirrored = DEFAULT_MIRRORED;
         let isSideways = DEFAULT_SIDEWAYS;
         let isControlsCollapsed = DEFAULT_CONTROLS_COLLAPSED;
@@ -841,11 +886,13 @@ Check the little footer for the code on Github.`;
             // Force update UI from loaded values
             fontSizeSlider.value = fontSize;
             scrollSpeedSlider.value = scrollSpeed;
+            controlsPositionSelect.value = controlsPosition;
             mirrorToggle.checked = isMirrored;
             sidewaysToggle.checked = isSideways;
 
             updateFontSize();
             updateScrollSpeed();
+            updateControlsPosition();
             updateMirrorMode();
             updateSidewaysMode();
             updateControlsState();
@@ -892,6 +939,7 @@ Check the little footer for the code on Github.`;
             const settings = {
                 fontSize: fontSize,
                 scrollSpeed: scrollSpeed,
+                controlsPosition: controlsPosition,
                 isMirrored: isMirrored,
                 isSideways: isSideways,
                 isControlsCollapsed: isControlsCollapsed,
@@ -907,6 +955,7 @@ Check the little footer for the code on Github.`;
                     const settings = JSON.parse(saved);
                     if (settings.fontSize) fontSize = parseInt(settings.fontSize);
                     if (settings.scrollSpeed) scrollSpeed = parseFloat(settings.scrollSpeed);
+                    if (settings.hasOwnProperty('controlsPosition')) controlsPosition = settings.controlsPosition;
                     if (settings.hasOwnProperty('isMirrored')) isMirrored = settings.isMirrored;
                     if (settings.hasOwnProperty('isSideways')) isSideways = settings.isSideways;
                     if (settings.hasOwnProperty('isControlsCollapsed')) isControlsCollapsed = settings.isControlsCollapsed;
@@ -972,6 +1021,13 @@ Check the little footer for the code on Github.`;
 
             fontSizeSlider.addEventListener('input', () => { updateFontSize(); saveSettings(); });
             scrollSpeedSlider.addEventListener('input', () => { updateScrollSpeed(); saveSettings(); });
+            
+            controlsPositionSelect.addEventListener('change', (e) => { 
+                controlsPosition = e.target.value; 
+                updateControlsPosition(); 
+                saveSettings(); 
+            });
+
             mirrorToggle.addEventListener('change', () => { updateMirrorMode(); saveSettings(); });
             sidewaysToggle.addEventListener('change', () => { updateSidewaysMode(); saveSettings(); });
             
@@ -1014,18 +1070,23 @@ Check the little footer for the code on Github.`;
                     // 2. Reset UI Controls to Default
                     fontSizeSlider.value = DEFAULT_FONT_SIZE;
                     scrollSpeedSlider.value = DEFAULT_SCROLL_SPEED;
+                    controlsPositionSelect.value = DEFAULT_CONTROLS_POSITION;
                     mirrorToggle.checked = DEFAULT_MIRRORED;
                     sidewaysToggle.checked = DEFAULT_SIDEWAYS;
                     isControlsCollapsed = DEFAULT_CONTROLS_COLLAPSED;
 
-                    // 3. Trigger Updates to sync Variables and View
+                    // 3. Sync Variables
+                    controlsPosition = DEFAULT_CONTROLS_POSITION;
+
+                    // 4. Trigger Updates to sync Variables and View
                     updateFontSize();     
                     updateScrollSpeed();  
+                    updateControlsPosition();
                     updateMirrorMode();   
                     updateSidewaysMode(); 
                     updateControlsState();
 
-                    // 4. Save
+                    // 5. Save
                     saveSettings();
                 });
             });
@@ -1160,6 +1221,16 @@ Check the little footer for the code on Github.`;
             if (scrollMode.style.display === 'block') {
                 showValuesDisplay();
             }
+        }
+
+        function updateControlsPosition() {
+            // Clear old classes
+            sideControls.classList.remove('pos-left', 'pos-right', 'pos-top', 'pos-bottom');
+            scrollTextContainer.classList.remove('pad-left', 'pad-right', 'pad-top', 'pad-bottom');
+            
+            // Apply new position/padding classes
+            sideControls.classList.add(`pos-${controlsPosition}`);
+            scrollTextContainer.classList.add(`pad-${controlsPosition}`);
         }
         
         function updateMirrorMode() {

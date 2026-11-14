@@ -48,14 +48,12 @@ footer{text-align:center;color:#aaa;font-size:.8rem;padding:12px}
 #split-view.with-camera #text-pane{flex:0 0 calc((100% - 22px) * var(--ratio,.5))}
 #camera-pane{flex:1 1 0;background:#111}
 .stage{flex:1 1 0;min-width:0;min-height:0;position:relative;overflow:hidden}
-
 .panel[data-position=top]{flex-direction:column-reverse}
 .panel[data-position=left]{flex-direction:row-reverse}
 .panel[data-position=right]{flex-direction:row}
 .panel-controls{display:flex;flex:0 0 auto;gap:4px;padding:4px;background:#191919;overflow:auto;align-items:center;max-width:100%;max-height:100%}
 .panel[data-position=left]>.panel-controls,
 .panel[data-position=right]>.panel-controls{flex-direction:column}
-
 .icon{display:flex;align-items:center;justify-content:center;flex:0 0 44px;width:44px;height:44px;min-height:44px;padding:0;border:0;background:#252525;font-size:1.1rem;border-radius:50%}
 .icon[aria-pressed=true]{background:#164f73}
 #pause-button.playing{background:#672d30}
@@ -70,13 +68,11 @@ footer{text-align:center;color:#aaa;font-size:.8rem;padding:12px}
 .front-camera{transform:scaleX(-1)}
 #camera-status{position:absolute;left:8px;right:8px;bottom:8px;font-size:.8rem;background:#000b;padding:6px;border-radius:6px;pointer-events:none;overflow-wrap:anywhere;max-height:75%;overflow:auto}
 #recording-time{position:absolute;top:8px;right:8px;background:#000b;border-radius:6px;padding:4px 8px;font-variant-numeric:tabular-nums;font-size:.85rem}
-
 #split-handle{display:flex;flex:0 0 22px;align-items:center;justify-content:center;background:#333;touch-action:none;cursor:row-resize;user-select:none}
 #split-handle:after{content:'';width:52px;height:4px;background:#aaa;border-radius:4px}
 #split-view[data-layout=columns]>#split-handle{cursor:col-resize}
 #split-view[data-layout=columns]>#split-handle:after{width:4px;height:52px}
 #values-display{position:absolute;top:5px;left:5px;padding:5px 9px;font-size:.8rem;background:#000c;border-radius:5px;pointer-events:none}
-
 body.reading{overflow:hidden}
 body.sideways #scroll-mode{inset:auto;top:0;left:0;width:100vh;height:100vw;transform-origin:top left;transform:translateX(100vw) rotate(90deg)}
 
@@ -90,6 +86,15 @@ dialog::backdrop{background:#000c}
 .download{display:inline-block;text-decoration:none}
 .take-info{font-size:.85rem;color:#bbb}
 #zip-status,#test-status{overflow-wrap:anywhere}
+
+.warning{border-left:4px solid #d29922!important;background:#241e10!important;border-radius:6px;padding:10px!important;color:#e6edf3;font-size:.85rem;overflow-wrap:anywhere}
+.warning strong{display:block;color:#e3b341;margin-bottom:4px}
+#camera-status.warning{max-height:75%;pointer-events:auto}
+#camera-pane.recording .stage::after{content:'';position:absolute;inset:0;border:4px solid #f44336;pointer-events:none;z-index:3}
+#delete-takes{border-color:#c54a50;color:#ffb3b8}
+.input-settings{margin:12px 0}
+.input-settings label{margin-bottom:10px}
+.take-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 
 @media(max-width:360px){
   main{padding:8px}
@@ -131,8 +136,7 @@ dialog::backdrop{background:#000c}
       </div>
 
       <label class="check">
-        <input id="mirror-toggle" type="checkbox">
-        Mirror Text
+        <input id="mirror-toggle" type="checkbox">Mirror Text
       </label>
 
       <label class="check">
@@ -199,10 +203,9 @@ dialog::backdrop{background:#000c}
           </div>
 
           <p class="note">
-            On phones, open this page directly in Chrome using an HTTPS address.
-            Plain HTTP addresses such as http://192.168.… cannot request camera
-            permission. Camera mode follows your device orientation. Videos stay
-            in this tab until downloaded.
+            Open this page directly in your browser using an HTTPS address.
+            Camera mode follows your device orientation.
+            Videos stay in this tab until downloaded.
           </p>
         </div>
       </section>
@@ -226,7 +229,6 @@ dialog::backdrop{background:#000c}
 
 <section id="scroll-mode" hidden>
   <div id="split-view" data-layout="rows">
-
     <section id="text-pane" class="panel" data-position="left" aria-label="Teleprompter">
       <div class="stage">
         <div id="scroll-text-container">
@@ -280,7 +282,6 @@ dialog::backdrop{background:#000c}
           aria-label="Recorded takes" title="Recorded takes">🎬</button>
       </nav>
     </section>
-
   </div>
 </section>
 
@@ -383,8 +384,15 @@ let valuesTimer = 0;
 const takes = [];
 let zipBusy = false;
 
+let status;
+let openCamera;
+let downloadAll;
+let updateButtons;
+let renderTake;
+
 function save() {
   settings.text = $('text-input').value;
+
   try {
     localStorage.setItem('makeItScrollSettings', JSON.stringify(settings));
     localStorage.setItem('makeItScrollCamera', JSON.stringify(camera));
@@ -402,11 +410,13 @@ function renderSettings() {
   $('camera-facing').value = camera.facing;
   $('audio-toggle').checked = camera.audio;
   $('camera-controls-position').value = camera.position;
+
   $('controls-content').hidden = settings.isControlsCollapsed;
   $('controls-toggle').setAttribute(
     'aria-expanded', !settings.isControlsCollapsed
   );
   $('chevron').textContent = settings.isControlsCollapsed ? '▶' : '▼';
+
   applySettings();
 }
 
@@ -419,6 +429,7 @@ function applySettings() {
   $('camera-pane').dataset.position = camera.position;
   $('split-view').dataset.layout = camera.layout;
   $('split-view').style.setProperty('--ratio', camera.ratio);
+
   $('split-handle').setAttribute(
     'aria-orientation',
     camera.layout === 'rows' ? 'horizontal' : 'vertical'
@@ -431,16 +442,11 @@ function applySettings() {
   );
 }
 
-function status(message) {
-  $('test-status').textContent = message;
-  $('camera-status').textContent = message;
-}
-
 function active() {
   return recorder && recorder.state !== 'inactive';
 }
 
-function updateButtons() {
+function baseUpdateButtons() {
   const ready = stream?.getVideoTracks().some(
     track => track.readyState === 'live'
   );
@@ -478,6 +484,7 @@ function updateButtons() {
 function stopMeter() {
   cancelAnimationFrame(meterFrame);
   meterFrame = 0;
+
   source?.disconnect();
   source = null;
   analyser = null;
@@ -486,12 +493,14 @@ function stopMeter() {
     audioContext.close().catch(() => {});
     audioContext = null;
   }
+
   $('mic-level').value = 0;
 }
 
 function startMeter() {
   stopMeter();
   $('mic-test').hidden = !stream?.getAudioTracks().length;
+
   if (!stream?.getAudioTracks().length) return;
 
   const Audio = window.AudioContext || window.webkitAudioContext;
@@ -504,6 +513,7 @@ function startMeter() {
   try {
     audioContext = new Audio();
     audioContext.resume().catch(() => {});
+
     source = audioContext.createMediaStreamSource(stream);
     analyser = audioContext.createAnalyser();
     analyser.fftSize = 1024;
@@ -515,9 +525,10 @@ function startMeter() {
 
     const tick = () => {
       if (!analyser) return;
-      analyser.getByteTimeDomainData(samples);
 
+      analyser.getByteTimeDomainData(samples);
       let sum = 0;
+
       for (const n of samples) sum += ((n - 128) / 128) ** 2;
 
       $('mic-level').value =
@@ -525,6 +536,7 @@ function startMeter() {
 
       meterFrame = requestAnimationFrame(tick);
     };
+
     tick();
   } catch {
     $('mic-info').textContent =
@@ -543,11 +555,16 @@ function attachPreview() {
     stream.getVideoTracks()[0].getSettings().facingMode || camera.facing;
 
   video.classList.toggle('front-camera', facing === 'user');
+
+  const previewStream = stream;
   video.play().catch(() => {
-    status('Preview could not play. Turn the camera off and on to retry.');
+    if (stream === previewStream && video.srcObject === previewStream) {
+      status('Preview could not play. Turn the camera off and on to retry.');
+    }
   });
 
   $('test-box').hidden = studio;
+
   if (studio) stopMeter();
   else startMeter();
 }
@@ -571,111 +588,31 @@ function closeCamera() {
 
 function accessProblem() {
   if (!window.isSecureContext) {
-    return 'Camera permission cannot appear on this connection. Open this page at an HTTPS address directly in Chrome. A phone visiting your computer’s http://192.168.… address needs HTTPS; desktop localhost is a special exception.';
+    return 'Camera permission cannot appear on this connection. Open this page at an HTTPS address directly in your browser. A phone visiting your computer’s http://192.168.… address needs HTTPS; desktop localhost is a special exception.';
   }
 
   if (!navigator.mediaDevices?.getUserMedia) {
-    return 'Camera access is unavailable here. Open the HTTPS page directly in Chrome instead of an in-app viewer or file preview.';
+    return 'Camera access is unavailable here. Open the HTTPS page directly in your browser instead of an in-app viewer or file preview.';
   }
 
   const policy = document.permissionsPolicy || document.featurePolicy;
-  if (policy &&
-      (!policy.allowsFeature('camera') ||
-       (camera.audio && !policy.allowsFeature('microphone')))) {
-    return 'This embedded page blocks camera or microphone access. Open the page directly in a new Chrome tab, or allow camera and microphone in the embedding page.';
+
+  if (
+    policy &&
+    (
+      !policy.allowsFeature('camera') ||
+      (camera.audio && !policy.allowsFeature('microphone'))
+    )
+  ) {
+    return 'This embedded page blocks camera or microphone access. Open the page directly in a new browser tab, or allow camera and microphone in the embedding page.';
   }
 
   return '';
 }
 
-async function openCamera() {
-  if (active() || finishing) return;
-
-  closeCamera();
-
-  const issue = accessProblem();
-  if (issue) {
-    status(issue);
-    return;
-  }
-
-  const id = requestId;
-  const locationAtRequest = studio;
-  busy = true;
-
-  status(
-    'Allow camera' +
-    (camera.audio ? ' and microphone' : '') +
-    ' access in the browser prompt…'
-  );
-  updateButtons();
-
-  permissionTimer = setTimeout(() => {
-    if (id === requestId && busy) {
-      status('Still waiting for permission. Check Chrome’s site permissions and Android Settings → Apps → Chrome → Permissions. Open the HTTPS page directly in Chrome; tap 📸 or Cancel to cancel this request.');
-    }
-  }, 15000);
-
-  try {
-    const result = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: { ideal: camera.facing },
-        width: { ideal: 1280 },
-        height: { ideal: 720 }
-      },
-      audio: camera.audio
-    });
-
-    if (id !== requestId || studio !== locationAtRequest) {
-      result.getTracks().forEach(track => track.stop());
-      return;
-    }
-
-    stream = result;
-    attachPreview();
-
-    result.getTracks().forEach(track => {
-      track.addEventListener('ended', () => {
-        if (stream !== result) return;
-        stopRecording();
-        closeCamera();
-        status('Camera or microphone disconnected. Turn the camera on to retry.');
-      });
-    });
-
-    status(
-      typeof MediaRecorder === 'undefined'
-        ? 'Preview works, but recording is unsupported in this browser.'
-        : `Camera ready · ${result.getAudioTracks().length ? 'Microphone on' : 'No audio'}${studio ? ' · Press 🔴 to record.' : ' · Check the preview and microphone level below.'}`
-    );
-  } catch (error) {
-    if (id !== requestId) return;
-
-    const errors = {
-      NotAllowedError:
-        'Access was denied or blocked. In Chrome, open Site settings and allow Camera and Microphone. Also check Android Settings → Apps → Chrome → Permissions. If you do not want audio, turn off Record microphone audio and retry.',
-      NotFoundError:
-        'No camera or microphone was found. Check the device, or turn off microphone audio and retry.',
-      NotReadableError:
-        'Camera or microphone is busy. Close other apps using it, then retry.',
-      OverconstrainedError:
-        'These camera settings are unavailable. Try the other camera.'
-    };
-
-    status(
-      errors[error.name] || error.message || 'Could not open the camera.'
-    );
-  } finally {
-    if (id === requestId) {
-      clearTimeout(permissionTimer);
-      busy = false;
-      updateButtons();
-    }
-  }
-}
-
 function toggleCamera() {
   if (active()) stopRecording();
+
   if (stream || busy) closeCamera();
   else openCamera();
 }
@@ -701,6 +638,7 @@ function pauseText() {
 
 function playText() {
   if (!studio) return;
+
   cancelAnimationFrame(scrollFrame);
   paused = false;
   lastTime = 0;
@@ -755,6 +693,7 @@ function start() {
 
   if (enabled) {
     pauseText();
+
     if (stream) attachPreview();
     else openCamera();
   } else {
@@ -777,16 +716,19 @@ function edit() {
 
   wake?.release().catch(() => {});
   wake = null;
+
   save();
 }
 
 function showValues() {
   applySettings();
+
   $('values-display').textContent =
     `${settings.fontSize}px · Speed ${settings.scrollSpeed.toFixed(2)}`;
-  $('values-display').hidden = false;
 
+  $('values-display').hidden = false;
   clearTimeout(valuesTimer);
+
   valuesTimer = setTimeout(() => {
     $('values-display').hidden = true;
   }, 2200);
@@ -796,6 +738,7 @@ function showValues() {
 
 function clock() {
   const sec = Math.floor((Date.now() - recordStart) / 1000);
+
   $('recording-time').textContent =
     '🔴 ' +
     String(Math.floor(sec / 60)).padStart(2, '0') +
@@ -804,8 +747,10 @@ function clock() {
 }
 
 function startRecording() {
-  if (!stream || busy || finishing ||
-      typeof MediaRecorder === 'undefined') return;
+  if (
+    !stream || busy || finishing ||
+    typeof MediaRecorder === 'undefined'
+  ) return;
 
   try {
     const mime = [
@@ -839,6 +784,7 @@ function startRecording() {
       clearInterval(timer);
       recorder = null;
       finishing = false;
+
       if (studio) pauseText();
 
       const blob = new Blob(chunks, {
@@ -892,9 +838,11 @@ function startRecording() {
 
 function stopRecording() {
   if (!active()) return;
+
   finishing = true;
   recorder.stop();
   clearInterval(timer);
+
   if (studio) pauseText();
   updateButtons();
 }
@@ -905,7 +853,7 @@ function openTakes() {
   $('takes-dialog').showModal();
 }
 
-function renderTake(take, index) {
+function baseRenderTake(take, index) {
   $('empty-takes').hidden = true;
 
   const item = document.createElement('article');
@@ -945,7 +893,7 @@ function renderTake(take, index) {
   $('takes-list').append(item);
 }
 
-/* Build an uncompressed ZIP locally. Video files are already compressed. */
+/* Local ZIP generation */
 const crcTable = Uint32Array.from({ length: 256 }, (_, n) => {
   for (let j = 0; j < 8; j++) {
     n = (n & 1) ? 0xedb88320 ^ (n >>> 1) : n >>> 1;
@@ -985,119 +933,7 @@ function header(size, fields) {
   return bytes;
 }
 
-async function downloadAll() {
-  if (zipBusy || !takes.length) return;
-
-  zipBusy = true;
-  updateButtons();
-
-  try {
-    const list = [...takes];
-    const parts = [];
-    const central = [];
-    let offset = 0;
-    let centralSize = 0;
-
-    const total = list.reduce(
-      (sum, take) =>
-        sum + take.blob.size + 2 * take.filename.length + 76,
-      22
-    );
-
-    if (list.length > 65535 || total > 0xffffffff) {
-      throw new Error(
-        'Archive is too large for one ZIP. Download the takes individually.'
-      );
-    }
-
-    for (let i = 0; i < list.length; i++) {
-      $('zip-status').textContent =
-        `Preparing take ${i + 1} of ${list.length}…`;
-
-      const take = list[i];
-      const name = new TextEncoder().encode(take.filename);
-      const crc = await crc32(take.blob);
-      const size = take.blob.size;
-      const d = take.date;
-
-      const time =
-        (d.getHours() << 11) |
-        (d.getMinutes() << 5) |
-        (d.getSeconds() >> 1);
-
-      const date =
-        ((d.getFullYear() - 1980) << 9) |
-        ((d.getMonth() + 1) << 5) |
-        d.getDate();
-
-      const local = header(30, [
-        [0, 0x04034b50, 4],
-        [4, 20, 2],
-        [6, 0x800, 2],
-        [10, time, 2],
-        [12, date, 2],
-        [14, crc, 4],
-        [18, size, 4],
-        [22, size, 4],
-        [26, name.length, 2]
-      ]);
-
-      const entry = header(46, [
-        [0, 0x02014b50, 4],
-        [4, 20, 2],
-        [6, 20, 2],
-        [8, 0x800, 2],
-        [12, time, 2],
-        [14, date, 2],
-        [16, crc, 4],
-        [20, size, 4],
-        [24, size, 4],
-        [28, name.length, 2],
-        [42, offset, 4]
-      ]);
-
-      parts.push(local, name, take.blob);
-      central.push(entry, name);
-      offset += 30 + name.length + size;
-      centralSize += 46 + name.length;
-    }
-
-    const end = header(22, [
-      [0, 0x06054b50, 4],
-      [8, list.length, 2],
-      [10, list.length, 2],
-      [12, centralSize, 4],
-      [16, offset, 4]
-    ]);
-
-    const archive = new Blob(
-      [...parts, ...central, end],
-      { type: 'application/zip' }
-    );
-
-    const url = URL.createObjectURL(archive);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'makeitscroll-takes.zip';
-    document.body.append(link);
-    link.click();
-    link.remove();
-
-    setTimeout(() => URL.revokeObjectURL(url), 600000);
-
-    $('zip-status').textContent =
-      `Download started: ${list.length} takes in one ZIP.`;
-  } catch (error) {
-    $('zip-status').textContent =
-      error.message ||
-      'Could not create ZIP. Download each take separately.';
-  } finally {
-    zipBusy = false;
-    updateButtons();
-  }
-}
-
-/* Settings and buttons */
+/* General controls */
 $('controls-toggle').onclick = () => {
   settings.isControlsCollapsed = !settings.isControlsCollapsed;
   $('controls-content').hidden = settings.isControlsCollapsed;
@@ -1154,18 +990,6 @@ $('camera-controls-position').onchange = event => {
   save();
 };
 
-$('camera-facing').onchange = event => {
-  camera.facing = event.target.value;
-  save();
-  if (stream || busy) openCamera();
-};
-
-$('audio-toggle').onchange = event => {
-  camera.audio = event.target.checked;
-  save();
-  if (stream || busy) openCamera();
-};
-
 $('text-input').oninput = save;
 $('start-button').onclick = start;
 $('edit-button').onclick = edit;
@@ -1207,20 +1031,9 @@ $('speed-decrease').onclick = () => {
   showValues();
 };
 
-$('test-camera').onclick = toggleCamera;
-$('camera-power').onclick = toggleCamera;
-
 $('record-button').onclick = () => {
   if (active()) stopRecording();
   else startRecording();
-};
-
-$('switch-camera').onclick = () => {
-  camera.facing =
-    camera.facing === 'user' ? 'environment' : 'user';
-  $('camera-facing').value = camera.facing;
-  save();
-  openCamera();
 };
 
 $('edit-takes').onclick = openTakes;
@@ -1232,8 +1045,6 @@ $('takes-dialog').addEventListener('close', () => {
     video.pause();
   });
 });
-
-$('download-all').onclick = downloadAll;
 
 $('paste-text-btn').onclick = async () => {
   try {
@@ -1263,7 +1074,7 @@ $('restore-text-btn').onclick = () => {
   }
 };
 
-/* Split resize: mouse, touch and keyboard */
+/* Split resizing */
 const handle = $('split-handle');
 
 handle.onpointerdown = event => {
@@ -1330,11 +1141,13 @@ const scroller = $('scroll-text-container');
 scroller.onpointerdown = event => {
   if (event.button !== 0) return;
   pauseText();
+
   drag = {
     x: event.clientX,
     y: event.clientY,
     top: scroller.scrollTop
   };
+
   scroller.setPointerCapture(event.pointerId);
 };
 
@@ -1346,6 +1159,7 @@ scroller.onpointermove = event => {
       ? event.clientX - drag.x
       : drag.y - event.clientY
   );
+
   scrollPosition = scroller.scrollTop;
 };
 
@@ -1355,7 +1169,6 @@ scroller.onpointerup = scroller.onpointercancel = () => {
 
 scroller.addEventListener('wheel', pauseText, { passive: true });
 
-/* Release devices and finalize a take before backgrounding. */
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) {
     stopRecording();
@@ -1377,6 +1190,620 @@ window.addEventListener('beforeunload', event => {
     event.returnValue = '';
   }
 });
+
+/* Device selection, warnings, sharing and takes management */
+(() => {
+  const inputSettings = document.createElement('div');
+  inputSettings.className = 'input-settings';
+  inputSettings.innerHTML = `
+    <div class="settings-grid">
+      <label>
+        Video input
+        <select id="video-input">
+          <option value="">Automatic (front/rear preference)</option>
+        </select>
+      </label>
+      <label>
+        Audio input
+        <select id="audio-input">
+          <option value="">System default microphone</option>
+        </select>
+      </label>
+    </div>
+    <button id="refresh-inputs" type="button">Refresh inputs</button>
+    <p class="note">
+      Test the camera first to reveal input names.
+      Choose a camera or microphone here, including external inputs exposed
+      by your phone's browser. Changing an input restarts the preview.
+      The 🔄 button returns to automatic front/rear selection.
+    </p>`;
+
+  $('audio-toggle').closest('label').after(inputSettings);
+
+  let videoId = '';
+  let audioId = '';
+  let deviceGeneration = 0;
+  let sharing = false;
+
+  const zipUrls = new Set();
+
+  const deleteButton = document.createElement('button');
+  deleteButton.id = 'delete-takes';
+  deleteButton.type = 'button';
+  deleteButton.textContent = 'Delete all takes';
+  $('download-all').after(deleteButton);
+
+  const takeNotice = document.createElement('div');
+  takeNotice.id = 'take-notice';
+  takeNotice.hidden = true;
+  takeNotice.setAttribute('role', 'alert');
+  $('zip-status').after(takeNotice);
+
+  function fillAlert(element, message, warning) {
+    element.replaceChildren();
+    element.classList.toggle('warning', warning);
+    element.setAttribute('role', warning ? 'alert' : 'status');
+
+    if (warning) {
+      const heading = document.createElement('strong');
+      heading.textContent = '⚠ Warning';
+      element.append(heading);
+    }
+
+    const text = document.createElement('span');
+    text.textContent = message;
+    element.append(text);
+  }
+
+  for (const id of ['test-status', 'camera-status']) {
+    const old = $(id);
+    const replacement = document.createElement('div');
+
+    replacement.id = id;
+    replacement.className = old.className;
+    replacement.textContent = old.textContent;
+    replacement.setAttribute('role', 'status');
+
+    old.replaceWith(replacement);
+  }
+
+  status = function(message, type) {
+    const warning =
+      type === 'warning' ||
+      (
+        type !== 'info' &&
+        /permission|denied|blocked|unavailable|not found|disconnect|could not|interrupted|unsupported|failed|cannot|waiting|allow camera|no video|busy/i.test(message)
+      );
+
+    fillAlert($('test-status'), message, warning);
+    fillAlert($('camera-status'), message, warning);
+
+    // A functioning camera has no informational text over its feed.
+    $('camera-status').hidden = !warning && !!stream;
+  };
+
+  function takeWarning(message) {
+    fillAlert(takeNotice, message, true);
+    takeNotice.hidden = false;
+  }
+
+  updateButtons = function() {
+    baseUpdateButtons();
+
+    const recording = !!active();
+    $('camera-pane').classList.toggle('recording', recording);
+
+    const locked = recording || finishing || busy;
+
+    for (const id of [
+      'video-input', 'camera-facing', 'refresh-inputs'
+    ]) {
+      $(id).disabled = locked;
+    }
+
+    $('audio-input').disabled = locked || !camera.audio;
+    $('audio-toggle').disabled = locked;
+
+    deleteButton.disabled =
+      !takes.length ||
+      recording ||
+      finishing ||
+      zipBusy ||
+      sharing;
+  };
+
+  async function refreshInputs() {
+    if (!navigator.mediaDevices?.enumerateDevices) {
+      status(
+        'This browser cannot list inputs. Use its default camera and microphone or the front/rear camera preference.',
+        'warning'
+      );
+      return;
+    }
+
+    const generation = ++deviceGeneration;
+
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      if (generation !== deviceGeneration) return;
+
+      for (const [id, kind, selected, automatic] of [
+        [
+          'video-input',
+          'videoinput',
+          videoId,
+          'Automatic (front/rear preference)'
+        ],
+        [
+          'audio-input',
+          'audioinput',
+          audioId,
+          'System default microphone'
+        ]
+      ]) {
+        const select = $(id);
+        select.replaceChildren(new Option(automatic, ''));
+
+        let number = 0;
+
+        for (const device of devices.filter(
+          device => device.kind === kind && device.deviceId
+        )) {
+          const label = device.label ||
+            `${kind === 'videoinput' ? 'Camera' : 'Microphone'} ${++number}`;
+
+          select.add(new Option(label, device.deviceId));
+        }
+
+        select.value = selected;
+
+        if (
+          selected &&
+          !Array.from(select.options).some(
+            option => option.value === selected
+          )
+        ) {
+          select.value = '';
+
+          if (kind === 'videoinput') videoId = '';
+          else audioId = '';
+
+          status(
+            'A selected input is no longer available. Reconnect it or choose another input before restarting the camera.',
+            'warning'
+          );
+        }
+      }
+
+      updateButtons();
+    } catch {
+      status(
+        'Could not list camera or microphone inputs. Allow access, then refresh the input list.',
+        'warning'
+      );
+    }
+  }
+
+  openCamera = async function() {
+    if (active() || finishing) return;
+
+    closeCamera();
+
+    const issue = accessProblem();
+    if (issue) {
+      status(issue, 'warning');
+      return;
+    }
+
+    const id = requestId;
+    const locationAtRequest = studio;
+
+    busy = true;
+    status(
+      'Allow camera' +
+      (camera.audio ? ' and microphone' : '') +
+      ' access in the browser prompt…',
+      'warning'
+    );
+    updateButtons();
+
+    permissionTimer = setTimeout(() => {
+      if (id === requestId && busy) {
+        status(
+          'Still waiting for permission. Check the browser’s site permissions and your phone’s camera/microphone permissions. You can cancel this request using the camera button.',
+          'warning'
+        );
+      }
+    }, 15000);
+
+    try {
+      const result = await navigator.mediaDevices.getUserMedia({
+        video: {
+          ...(videoId
+            ? { deviceId: { exact: videoId } }
+            : { facingMode: { ideal: camera.facing } }),
+          width: { ideal: 1280 },
+          height: { ideal: 720 }
+        },
+        audio: camera.audio
+          ? (audioId ? { deviceId: { exact: audioId } } : true)
+          : false
+      });
+
+      if (id !== requestId || studio !== locationAtRequest) {
+        result.getTracks().forEach(track => track.stop());
+        return;
+      }
+
+      stream = result;
+      attachPreview();
+
+      result.getTracks().forEach(track => {
+        track.addEventListener('ended', () => {
+          if (stream !== result) return;
+
+          stopRecording();
+          closeCamera();
+
+          status(
+            'Camera or microphone disconnected. Choose an available input and turn the camera on again.',
+            'warning'
+          );
+        });
+      });
+
+      status(
+        typeof MediaRecorder === 'undefined'
+          ? 'Preview works, but recording is unsupported in this browser.'
+          : 'Camera ready · ' +
+            (result.getAudioTracks().length ? 'Microphone on' : 'No audio') +
+            ' · Check the preview before recording.'
+      );
+
+      await refreshInputs();
+    } catch (error) {
+      if (id !== requestId) return;
+
+      const errors = {
+        NotAllowedError:
+          'Access was denied or blocked. Allow Camera and Microphone in this site’s browser settings and in your phone’s app permissions. You can turn off microphone audio and retry.',
+        NotFoundError:
+          'The selected camera or microphone was not found. Refresh inputs and choose another device.',
+        NotReadableError:
+          'Camera or microphone is busy. Close other apps using it, or choose a different input.',
+        OverconstrainedError:
+          'The selected input is unavailable. Refresh inputs and select another device or Automatic.'
+      };
+
+      status(
+        errors[error.name] ||
+        error.message ||
+        'Could not open the camera.',
+        'warning'
+      );
+    } finally {
+      if (id === requestId) {
+        clearTimeout(permissionTimer);
+        busy = false;
+        updateButtons();
+      }
+    }
+  };
+
+  $('refresh-inputs').onclick = refreshInputs;
+
+  $('video-input').onchange = event => {
+    videoId = event.target.value;
+    if (stream || busy) openCamera();
+  };
+
+  $('audio-input').onchange = event => {
+    audioId = event.target.value;
+    if (stream || busy) openCamera();
+  };
+
+  $('camera-facing').onchange = event => {
+    camera.facing = event.target.value;
+    videoId = '';
+    $('video-input').value = '';
+
+    save();
+    if (stream || busy) openCamera();
+  };
+
+  $('audio-toggle').onchange = event => {
+    camera.audio = event.target.checked;
+    save();
+
+    if (stream || busy) openCamera();
+    else updateButtons();
+  };
+
+  $('switch-camera').onclick = () => {
+    videoId = '';
+    $('video-input').value = '';
+
+    camera.facing =
+      camera.facing === 'user' ? 'environment' : 'user';
+
+    $('camera-facing').value = camera.facing;
+    save();
+    openCamera();
+  };
+
+  navigator.mediaDevices?.addEventListener?.(
+    'devicechange', refreshInputs
+  );
+
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && $('camera-toggle').checked) {
+      refreshInputs();
+    }
+  });
+
+  /* Native iPhone/iPad file sharing */
+  const isIOS =
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (
+      navigator.platform === 'MacIntel' &&
+      navigator.maxTouchPoints > 1
+    );
+
+  renderTake = function(take, index) {
+    baseRenderTake(take, index);
+
+    const item = $('takes-list').lastElementChild;
+    const actions = document.createElement('div');
+
+    actions.className = 'take-actions';
+    actions.append(item.querySelector('a.download'));
+
+    const file = new File([take.blob], take.filename, {
+      type: take.blob.type.split(';')[0],
+      lastModified: take.date.getTime()
+    });
+
+    let canShare = false;
+
+    try {
+      canShare =
+        !!navigator.share &&
+        !!navigator.canShare?.({ files: [file] });
+    } catch {}
+
+    if (canShare) {
+      const share = document.createElement('button');
+      share.type = 'button';
+      share.className = 'share-take';
+      share.textContent =
+        isIOS ? 'Save / share to Photos' : 'Share video';
+
+      share.onclick = async () => {
+        if (sharing) return;
+
+        sharing = true;
+        takeNotice.hidden = true;
+        item.querySelector('video').pause();
+
+        document.querySelectorAll('.share-take').forEach(button => {
+          button.disabled = true;
+        });
+
+        updateButtons();
+
+        try {
+          await navigator.share({ files: [file] });
+        } catch (error) {
+          if (error.name !== 'AbortError') {
+            takeWarning(
+              'Could not open the share sheet. Download the video, then open it from Files to save or share it.'
+            );
+          }
+        } finally {
+          sharing = false;
+
+          document.querySelectorAll('.share-take').forEach(button => {
+            button.disabled = false;
+          });
+
+          updateButtons();
+        }
+      };
+
+      actions.append(share);
+    }
+
+    item.append(actions);
+
+    if (isIOS) {
+      const help = document.createElement('p');
+      help.className = 'note';
+
+      help.textContent = canShare
+        ? 'In the iOS share sheet, choose Save Video to add this take to Photos, if offered. MP4 recordings are preferred. Saving to Photos is controlled by iOS.'
+        : 'Direct video sharing is unavailable here. Download this take, open it in Files, then use Share → Save Video if iOS offers it. WebM files may need conversion to MP4.';
+
+      item.append(help);
+    }
+  };
+
+  /* Delete all takes and release their object URLs */
+  deleteButton.onclick = () => {
+    if (
+      active() || finishing || zipBusy ||
+      sharing || !takes.length
+    ) return;
+
+    if (!confirm(
+      `Delete all ${takes.length} takes from this tab’s memory? Downloaded or saved copies will remain. This cannot be undone.`
+    )) return;
+
+    $('takes-list').querySelectorAll('video').forEach(video => {
+      video.pause();
+      video.removeAttribute('src');
+      video.load();
+    });
+
+    for (const take of takes) URL.revokeObjectURL(take.url);
+    takes.length = 0;
+
+    for (const url of zipUrls) URL.revokeObjectURL(url);
+    zipUrls.clear();
+
+    $('takes-list').replaceChildren();
+    $('empty-takes').hidden = false;
+    $('zip-status').textContent = 'All takes deleted from this tab.';
+    takeNotice.hidden = true;
+
+    updateButtons();
+  };
+
+  /* Download all takes in one ZIP */
+  downloadAll = async function() {
+    if (zipBusy || !takes.length) return;
+
+    zipBusy = true;
+    updateButtons();
+    takeNotice.hidden = true;
+
+    try {
+      const list = [...takes];
+      const parts = [];
+      const central = [];
+
+      let offset = 0;
+      let centralSize = 0;
+
+      const total = list.reduce(
+        (sum, take) =>
+          sum + take.blob.size + 2 * take.filename.length + 76,
+        22
+      );
+
+      if (list.length > 65535 || total > 0xffffffff) {
+        throw new Error(
+          'Archive is too large for one ZIP. Download the takes individually.'
+        );
+      }
+
+      for (let i = 0; i < list.length; i++) {
+        $('zip-status').textContent =
+          `Preparing take ${i + 1} of ${list.length}…`;
+
+        const take = list[i];
+        const name = new TextEncoder().encode(take.filename);
+        const crc = await crc32(take.blob);
+        const size = take.blob.size;
+        const d = take.date;
+
+        const time =
+          (d.getHours() << 11) |
+          (d.getMinutes() << 5) |
+          (d.getSeconds() >> 1);
+
+        const date =
+          ((d.getFullYear() - 1980) << 9) |
+          ((d.getMonth() + 1) << 5) |
+          d.getDate();
+
+        const local = header(30, [
+          [0, 0x04034b50, 4],
+          [4, 20, 2],
+          [6, 0x800, 2],
+          [10, time, 2],
+          [12, date, 2],
+          [14, crc, 4],
+          [18, size, 4],
+          [22, size, 4],
+          [26, name.length, 2]
+        ]);
+
+        const entry = header(46, [
+          [0, 0x02014b50, 4],
+          [4, 20, 2],
+          [6, 20, 2],
+          [8, 0x800, 2],
+          [12, time, 2],
+          [14, date, 2],
+          [16, crc, 4],
+          [20, size, 4],
+          [24, size, 4],
+          [28, name.length, 2],
+          [42, offset, 4]
+        ]);
+
+        parts.push(local, name, take.blob);
+        central.push(entry, name);
+
+        offset += 30 + name.length + size;
+        centralSize += 46 + name.length;
+      }
+
+      const end = header(22, [
+        [0, 0x06054b50, 4],
+        [8, list.length, 2],
+        [10, list.length, 2],
+        [12, centralSize, 4],
+        [16, offset, 4]
+      ]);
+
+      const archive = new Blob(
+        [...parts, ...central, end],
+        { type: 'application/zip' }
+      );
+
+      const url = URL.createObjectURL(archive);
+      zipUrls.add(url);
+
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'makeitscroll-takes.zip';
+
+      document.body.append(link);
+      link.click();
+      link.remove();
+
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+        zipUrls.delete(url);
+      }, 600000);
+
+      $('zip-status').textContent =
+        `Download started: ${list.length} takes in one ZIP.`;
+    } catch (error) {
+      $('zip-status').textContent = '';
+
+      takeWarning(
+        error.message ||
+        'Could not create ZIP. Download each take separately.'
+      );
+    } finally {
+      zipBusy = false;
+      updateButtons();
+    }
+  };
+
+  $('download-all').onclick = downloadAll;
+  $('camera-power').onclick = toggleCamera;
+  $('test-camera').onclick = toggleCamera;
+
+  const oldRestore = $('restore-text-btn').onclick;
+
+  $('restore-text-btn').onclick = () => {
+    oldRestore();
+
+    if (!$('camera-toggle').checked) {
+      videoId = '';
+      audioId = '';
+      $('video-input').value = '';
+      $('audio-input').value = '';
+    }
+
+    updateButtons();
+  };
+
+  updateButtons();
+})();
 
 $('year').textContent = new Date().getFullYear();
 renderSettings();

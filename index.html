@@ -51,26 +51,39 @@ label{display:block;font-size:.9rem;font-weight:550;color:#d9e3f0}
 p{margin:.65rem 0}
 main{width:min(1120px,100%);margin:auto;padding:32px 24px 20px}
 
-#start-button{
+/* Desktop: setup on the left, script editor on the right. */
+.workspace{
+  display:grid;
+  grid-template-columns:360px minmax(0,1fr);
+  gap:20px;
+  align-items:start;
+}
+.controls-column{
+  min-width:0;
+  overflow:hidden;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:16px;
+}
+.controls-column>#start-button{
   position:relative;
+  display:block;
   width:100%;
-  margin:0 0 20px;
+  margin:0;
+  min-height:76px;
+  padding:16px 12px;
   border:0;
   border-radius:16px 16px 0px 0px;
-  min-height:76px;
-  padding:16px 22px;
+  overflow:hidden;
   color:#092c3b;
-  font-size:clamp(1.55rem,5vw,2.2rem);
+  font-size:clamp(1.35rem,2.6vw,1.65rem);
   font-weight:800;
   letter-spacing:-.045em;
   background:linear-gradient(115deg,#91e8ce,#fcedd4,#91e8ce);
   background-size:220% 220%;
   animation:scroll-gradient 7s ease-in-out infinite;
-  box-shadow:0 8px 26px #fcedd417;
-  overflow:hidden;
 }
-#start-button:hover{filter:brightness(1.07)}
-.start-arrow{
+#start-button:hover{filter:brightness(1.07)}{
   font-family:"DejaVu Sans","Segoe UI Symbol","Apple Symbols",sans-serif;
   font-weight:400;
 }
@@ -83,7 +96,7 @@ main{width:min(1120px,100%);margin:auto;padding:32px 24px 20px}
 }
 #start-border path{
   fill:none;
-  stroke:#fcedd4;
+  Stroke:#092c3b;
   stroke-width:1.5;
   stroke-dasharray:1 7;
   stroke-linecap:round;
@@ -95,25 +108,41 @@ main{width:min(1120px,100%);margin:auto;padding:32px 24px 20px}
 }
 @keyframes button-march{to{stroke-dashoffset:-8}}
 
-.workspace{
-  display:grid;
-  grid-template-columns:minmax(0,1fr) 360px;
-  gap:20px;
-  align-items:start;
+.controls-column>.controls{
+  display:flow-root;
+  border:0;
+  border-radius:0;
+  background:transparent;
+  padding:6px 20px 18px;
 }
-.script-card > #start-button {
-  display: block;
-  width: 100%;
-  margin: 0;
+#controls-toggle{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  width:100%;
+  background:#202f40;
+  border:1px solid #435871;
+  border-radius:11px;
+  text-align:left;
+  padding:13px 14px;
+  min-height:52px;
+  margin:12px 0 10px;
+  font-size:.98rem;
+  box-shadow:0 2px 0 #0003;
 }
+#controls-toggle:hover{background:#2a4055;border-color:var(--accent)}
+#controls-toggle[aria-expanded=true]{border-color:#5b8c83;background:#1b3937}
+#chevron{color:var(--muted);font-size:.75rem}
+#controls-content{padding-top:8px}
 
-.script-card,.controls{
+.script-card{
   min-width:0;
+  overflow:hidden;
   background:var(--surface);
   border:1px solid var(--line);
   border-radius:18px;
 }
-.script-card{overflow:hidden}
 .editor-tools{
   display:flex;
   gap:8px;
@@ -160,27 +189,6 @@ main{width:min(1120px,100%);margin:auto;padding:32px 24px 20px}
 #fullscreen-note{margin:0;padding:0 20px 12px;font-size:.78rem}
 #fullscreen-button[aria-pressed=true]{background:#234e45;border-color:#559e89}
 
-.controls{padding:6px 20px 18px}
-#controls-toggle{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:10px;
-  width:100%;
-  background:#202f40;
-  border:1px solid #435871;
-  border-radius:11px;
-  text-align:left;
-  padding:13px 14px;
-  min-height:52px;
-  margin:12px 0 10px;
-  font-size:.98rem;
-  box-shadow:0 2px 0 #0003;
-}
-#controls-toggle:hover{background:#2a4055;border-color:var(--accent)}
-#controls-toggle[aria-expanded=true]{border-color:#5b8c83;background:#1b3937}
-#chevron{color:var(--muted);font-size:.75rem}
-#controls-content{padding-top:8px}
 .settings-grid{display:grid;grid-template-columns:1fr;gap:18px}
 .settings-grid select,.input-settings select{
   width:100%;
@@ -540,29 +548,28 @@ body.expanded-editor #edit-mode{
   overflow:auto;
   scrollbar-width:none;
 }
-body.expanded-editor .workspace{grid-template-columns:1fr}
+body.expanded-editor .workspace{grid-template-columns:minmax(0,1fr)}
 body.expanded-editor .controls,body.expanded-editor footer{display:none}
 body.expanded-editor #text-input{min-height:55vh}
 
 @media(max-width:800px){
   main{padding:max(16px,env(safe-area-inset-top)) 16px 12px}
-  .workspace{grid-template-columns:1fr;gap:18px}
+  .workspace{grid-template-columns:minmax(0,1fr);gap:18px}
   #text-input{min-height:260px;max-height:none}
-  .controls{padding:0 18px 18px}
+  .controls-column>.controls{padding:0 18px 18px}
   .settings-grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
   .script-card{border-radius:16px}
   .editor-tools{padding:12px 12px 6px}
   .editor-tools button{flex-basis:calc(50% - 8px)}
   .editor-stats{padding:6px 16px 12px;column-gap:14px}
   .input-settings .settings-grid{grid-template-columns:1fr}
-  #start-button{min-height:70px;margin-bottom:16px}
   .modal-body{padding:16px 18px}
 }
 @media(max-width:360px){
   main{padding-left:12px;padding-right:12px}
   .icon{width:44px;height:44px;min-height:44px;flex-basis:44px}
   .panel-controls{gap:5px;padding:8px}
-  .controls{padding:0 14px 16px}
+  .controls-column>.controls{padding:0 14px 16px}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation:none!important;scroll-behavior:auto!important}
@@ -573,15 +580,111 @@ body.expanded-editor #text-input{min-height:55vh}
 
 <main id="edit-mode">
   <div class="workspace">
+    <aside class="controls-column" aria-label="Teleprompter setup">
+      <button id="start-button">
+        ↖ Make-It-Scroll ↘
+        <svg id="start-border" aria-hidden="true" focusable="false"><path></path></svg>
+      </button>
+
+      <section class="controls">
+        <button id="controls-toggle" aria-expanded="true" aria-controls="controls-content">
+          Teleprompter Controls <span id="chevron">▼</span>
+        </button>
+
+        <div id="controls-content">
+          <div class="settings-grid">
+            <label>
+              Font Size: <output id="font-size-value">36</output>px
+              <input id="font-size" type="range" min="24" max="96" value="36">
+            </label>
+            <label>
+              Scroll Speed: <output id="scroll-speed-value">0.40</output>
+              <input id="scroll-speed" type="range" min="0.01" max="2" step="0.01" value="0.4">
+            </label>
+            <label>
+              Controls Position
+              <select id="controls-position">
+                <option value="left">Left</option>
+                <option value="right">Right</option>
+                <option value="top">Top</option>
+                <option value="bottom">Bottom</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="check">
+            <input id="mirror-toggle" type="checkbox">Mirror Text
+          </label>
+          <label class="check">
+            <input id="sideways-toggle" type="checkbox">Force Sideways (text-only mode)
+          </label>
+
+          <section class="camera-settings">
+            <label class="check">
+              <input id="camera-toggle" type="checkbox">Enable camera &amp; video recording
+            </label>
+
+            <div id="camera-options" hidden>
+              <div class="settings-grid">
+                <label>
+                  Split layout
+                  <select id="split-layout">
+                    <option value="rows">Top / bottom</option>
+                    <option value="columns">Left / right</option>
+                  </select>
+                </label>
+                <label>
+                  Camera
+                  <select id="camera-facing">
+                    <option value="user">Front / webcam</option>
+                    <option value="environment">Rear camera</option>
+                  </select>
+                </label>
+                <label>
+                  Camera Controls Position
+                  <select id="camera-controls-position">
+                    <option value="bottom">Bottom</option>
+                    <option value="top">Top</option>
+                    <option value="left">Left</option>
+                    <option value="right">Right</option>
+                  </select>
+                </label>
+              </div>
+
+              <label class="check">
+                <input id="audio-toggle" type="checkbox" checked>Record microphone audio
+              </label>
+
+              <div class="actions">
+                <button id="test-camera" type="button">Test camera &amp; microphone</button>
+                <button id="edit-takes" type="button">Recorded takes (0)</button>
+              </div>
+
+              <p id="test-status" class="note" role="status">
+                Use Test to check the camera and microphone before scrolling.
+              </p>
+
+              <div id="test-box" hidden>
+                <video id="test-preview" autoplay muted playsinline></video>
+                <label id="mic-test">
+                  Microphone level
+                  <meter id="mic-level" min="0" max="1" value="0"></meter>
+                  <span id="mic-info" class="note">Speak to test your microphone.</span>
+                </label>
+              </div>
+
+              <p class="note">
+                Camera access requires HTTPS and browser permission.
+                Recordings stay in this tab until you download them.
+                Camera mode follows your device orientation.
+              </p>
+            </div>
+          </section>
+        </div>
+      </section>
+    </aside>
+
     <section class="script-card" aria-label="Script editor">
-<button id="start-button">
-    <span class="start-arrow">↖</span>
-    Make-It-Scroll
-    <span class="start-arrow">↘</span>
-    <svg id="start-border" aria-hidden="true" focusable="false">
-      <path></path>
-    </svg>
-  </button>
       <div class="editor-tools">
         <button id="paste-text-btn">Paste text</button>
         <button id="clear-text-btn">Clear text</button>
@@ -603,103 +706,6 @@ body.expanded-editor #text-input{min-height:55vh}
 
       <textarea id="text-input" aria-label="Teleprompter script"
         placeholder="Write or paste your script here…" spellcheck="true"></textarea>
-    </section>
-
-    <section class="controls">
-      <button id="controls-toggle" aria-expanded="true" aria-controls="controls-content">
-        Teleprompter Controls <span id="chevron">▼</span>
-      </button>
-
-      <div id="controls-content">
-        <div class="settings-grid">
-          <label>
-            Font Size: <output id="font-size-value">36</output>px
-            <input id="font-size" type="range" min="24" max="96" value="36">
-          </label>
-          <label>
-            Scroll Speed: <output id="scroll-speed-value">0.40</output>
-            <input id="scroll-speed" type="range" min="0.01" max="2" step="0.01" value="0.4">
-          </label>
-          <label>
-            Controls Position
-            <select id="controls-position">
-              <option value="left">Left</option>
-              <option value="right">Right</option>
-              <option value="top">Top</option>
-              <option value="bottom">Bottom</option>
-            </select>
-          </label>
-        </div>
-
-        <label class="check">
-          <input id="mirror-toggle" type="checkbox">Mirror Text
-        </label>
-        <label class="check">
-          <input id="sideways-toggle" type="checkbox">Force Sideways (text-only mode)
-        </label>
-
-        <section class="camera-settings">
-          <label class="check">
-            <input id="camera-toggle" type="checkbox">Enable camera &amp; video recording
-          </label>
-
-          <div id="camera-options" hidden>
-            <div class="settings-grid">
-              <label>
-                Split layout
-                <select id="split-layout">
-                  <option value="rows">Top / bottom</option>
-                  <option value="columns">Left / right</option>
-                </select>
-              </label>
-              <label>
-                Camera
-                <select id="camera-facing">
-                  <option value="user">Front / webcam</option>
-                  <option value="environment">Rear camera</option>
-                </select>
-              </label>
-              <label>
-                Camera Controls Position
-                <select id="camera-controls-position">
-                  <option value="bottom">Bottom</option>
-                  <option value="top">Top</option>
-                  <option value="left">Left</option>
-                  <option value="right">Right</option>
-                </select>
-              </label>
-            </div>
-
-            <label class="check">
-              <input id="audio-toggle" type="checkbox" checked>Record microphone audio
-            </label>
-
-            <div class="actions">
-              <button id="test-camera" type="button">Test camera &amp; microphone</button>
-              <button id="edit-takes" type="button">Recorded takes (0)</button>
-            </div>
-
-            <p id="test-status" class="note" role="status">
-              Use Test to check the camera and microphone before scrolling.
-            </p>
-
-            <div id="test-box" hidden>
-              <video id="test-preview" autoplay muted playsinline></video>
-              <label id="mic-test">
-                Microphone level
-                <meter id="mic-level" min="0" max="1" value="0"></meter>
-                <span id="mic-info" class="note">Speak to test your microphone.</span>
-              </label>
-            </div>
-
-            <p class="note">
-              Camera access requires HTTPS and browser permission.
-              Recordings stay in this tab until you download them.
-              Camera mode follows your device orientation.
-            </p>
-          </div>
-        </section>
-      </div>
     </section>
   </div>
 
@@ -2112,29 +2118,7 @@ document.addEventListener('keydown', event => {
 });
 syncFullscreen();
 
-/* Keep mobile visual order and keyboard order consistent. */
-const mobileLayout = matchMedia('(max-width:800px)');
-
-function arrangeEditor() {
-  const workspace = document.querySelector('.workspace');
-  const controls = workspace.querySelector('.controls');
-  const script = workspace.querySelector('.script-card');
-
-  if (mobileLayout.matches) workspace.insertBefore(controls, script);
-  else workspace.append(controls);
-
-  resizeEditor();
-  scheduleMetrics();
-}
-
-if (mobileLayout.addEventListener) {
-  mobileLayout.addEventListener('change', arrangeEditor);
-} else {
-  mobileLayout.addListener(arrangeEditor);
-}
-arrangeEditor();
-
-/* Responsive, continuously moving dotted button border. */
+/* Responsive, continuously moving dotted button border */
 function sizeStartBorder() {
   const button = $('start-button');
   const svg = $('start-border');
